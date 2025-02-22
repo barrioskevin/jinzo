@@ -1,0 +1,4 @@
+target/**
+src/main/resources/**
+tokens/**
+dependency-reduced-pom.xml
