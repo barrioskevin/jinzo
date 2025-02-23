@@ -21,10 +21,11 @@ public class SidePanel extends JPanel
 {
   private BufferedImage originalImage;
   private Image scaledImage;
+  private ImageIcon icon;
   private JLabel imageLabel;
 
   //default to 660x1080
-  public SidePanel(String path) { this(path, 660, 1080); }
+  public SidePanel(String path) { this(path, 640, 1080); }
   public SidePanel(String path, int width, int height)
   {
     setLayout(new BorderLayout());
@@ -42,9 +43,10 @@ public class SidePanel extends JPanel
       g.dispose();
     }
 
-    imageLabel = new JLabel(new ImageIcon(scaledImage));
+    icon = new ImageIcon(scaledImage);
+    imageLabel = new JLabel(icon);
     imageLabel.setOpaque(true);
-    imageLabel.setBackground(Color.RED);
+    imageLabel.setBackground(Color.BLACK);
 
     add(imageLabel, BorderLayout.CENTER); 
   }
