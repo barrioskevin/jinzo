@@ -22,11 +22,12 @@ public class AppFrame extends JFrame
   private SidePanel leftPanel;
   private VideoPanel middlePanel;
   private SidePanel rightPanel;
+  private JPanel contentPane;
 
   public AppFrame()
   {
-    leftPanel = new SidePanel("/home/kusa/UwU/jinzo/src/main/resources/ttuesday.jpg");
-    rightPanel = new SidePanel("/home/kusa/UwU/jinzo/src/main/resources/qts.jpg");
+    leftPanel = new SidePanel("/home/kusa/UwU/jinzo/src/main/resources/logo-stack.png");
+    rightPanel = new SidePanel("/home/kusa/UwU/jinzo/src/main/resources/logo-stack.png");
     middlePanel = new VideoPanel();
 
     setUndecorated(true);
@@ -39,7 +40,7 @@ public class AppFrame extends JFrame
       }
     });
 
-    JPanel contentPane = new JPanel();
+    contentPane = new JPanel();
 
     //contentPane.setLayout(new GridLayout(1, 3, 0, 0));
     contentPane.setLayout(new BorderLayout());
@@ -52,17 +53,13 @@ public class AppFrame extends JFrame
     setVisible(true);
       
     device.setFullScreenWindow(this);
-
-    middlePanel.playVideo("/home/kusa/UwU/jinzo/src/main/resources/special.mp4");
+    middlePanel.play();
 
     /*
-    Timer timer = new Timer();
-    timer.schedule(new ImageSwitcher(leftPanel), 1000);
-    */
-
     System.out.println("VIDEO FRAME CREATED, SHOWING CONTENT");
     System.out.println("Left Panel" + leftPanel.getSize());
     System.out.println("video " + middlePanel.getSize());
     System.out.println("Right Panel" + rightPanel.getSize());
+    */
   }
 }
