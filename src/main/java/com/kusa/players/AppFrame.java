@@ -16,8 +16,22 @@ import java.awt.GridLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+/**
+ * Class representing the main frame.
+ * aka: EngagmentFrame (will rename soon).
+ *
+ * This class is the heart of the application it will be what is running on the applications
+ * window.
+ */
 public class AppFrame extends JFrame
 {
+
+  /**
+   * GraphicsDevice of the screen that the device is running on.
+   *
+   * might not work for all enviornments. but we define the screen 
+   * so that we can make our app go into full screen mode after launching.
+   */
   static GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
 
   private SidePanel leftPanel;
@@ -25,6 +39,19 @@ public class AppFrame extends JFrame
   private SidePanel rightPanel;
   private JPanel contentPane;
 
+  /**
+   * Constructs the engagment frame.
+   * 
+   * While right now this engagment frame is handling alot I eventually want to add
+   * paramters for this constructor insttead of internally creating the panels.
+   *
+   * Operations:
+   *  - Constructs needed panels. 2 side panels and 1 video panel. 
+   *  - Constructs the content pane where panels will be added.
+   *  - sets frame properties such as underorated and visible to true.
+   *  - uses the GraphicsDevice to enable full screen on this frame.
+   *  - starts the video panel.
+   */
   public AppFrame()
   {
     leftPanel = new SidePanel(Config.getProperty("downloadPath") + "photos/logo-stack.png");
