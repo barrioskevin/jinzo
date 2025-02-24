@@ -84,9 +84,10 @@ Sequential runs should automatically start the engagment player in fullscreen.
 
 - Video panels plays media content controlled by a Playlist object.
 
-## Engagment Player
+## Engagment Frame 
 
 - JFrame that manages the window containing side panels and video panels.
+- Plans for future flexability in order to manage various kinds of engaging layouts!
 
 ## Playlist
 
@@ -133,4 +134,4 @@ I'm currently trying to modularize as much as I can in the project to allow for 
 Thank you for checking out my Engaging Video Player project! This project is a work in progress and I'm utilizing Github as a way to share my progress and to practice VC in a professional manner. You are free to contact me with any questions or concerns. As I plan on working more on this project and improving upon it's design, I would appreciate any feedback or requests. Thank you for your time!
 
 - Kevin Barrios
-- barrik3@unlv.nevada.edu 
+- barrik3@unlv.nevada.edu
