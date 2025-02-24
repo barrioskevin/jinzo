@@ -11,6 +11,17 @@ import java.util.List;
 import java.util.Timer;
 
 
+/**
+ * Main class.
+ *
+ * Responsible for launching the app and any services.
+ *
+ * we need to make sure that we do thing properly here.
+ * there is sort of a "hidden" startup that happens in Config.java
+ * where the internal properties are loaded in.
+ * 
+ * In this class we should just spin everything up.
+ */
 public class App 
 {
   public static void main(String args[])
