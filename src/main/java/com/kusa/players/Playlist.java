@@ -1,6 +1,7 @@
 package com.kusa.players;
 
 
+import com.kusa.Config; 
 import com.kusa.service.LocalService;
 import java.util.List;
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.HashSet;
 
 public class Playlist
 {
-  public static final String vidDir = "/home/kusa/UwU/jinzo/src/main/resources/drive/";
+  public static final String vidDir = Config.getProperty("downloadPath") + "videos/";
   List<String> videoMRLS;
   Set<String> videoTitles;
   private int videoIndex;
@@ -20,7 +21,7 @@ public class Playlist
     videoMRLS = new ArrayList<>(LocalService.getDownloadedVideoNames());
     videoTitles = new HashSet<>(videoMRLS);
     videoIndex = 0;
-    currentVideoPath = vidDir + videoMRLS.get(0);
+    currentVideoPath = vidDir + (videoMRLS.isEmpty() ? "" : videoMRLS.get(0));
   }
 
   public void addVideoMRL(String mrl)
@@ -36,11 +37,14 @@ public class Playlist
   
   public String next()
   {
+    if(videoMRLS.isEmpty())
+      return currentVideoPath;
+
     if(videoIndex >= videoMRLS.size())
       videoIndex = 0;
 
     if(videoMRLS.get(videoIndex) != null)
-      currentVideoPath = vidDir + videoMRLS.get(videoIndex++); 
+      currentVideoPath = vidDir + videoMRLS.get(videoIndex++);
 
     return currentVideoPath;
   }
