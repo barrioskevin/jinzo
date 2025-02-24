@@ -57,14 +57,23 @@ public class GDriveService
   /* we specify the paths used for storing the apps data + login tokens.
    * 'tokens/' locally stored login tokens (drive user's tokens)
    * '/credentials' this file contains the app's credentials, comes from google dev console.
-   *
-   * credentials is a class getresource path.
    */
   private static final String TOKEN_STORAGE_PATH = Config.getProperty("tokenStoragePath");
   private static final String CREDENTIALS_FILE_PATH = Config.getProperty("googleCredentialsPath");
 
 
 
+  /**
+   * Constructor for creating the google drive service.
+   *
+   * we should only be creating one instance of this service
+   * if its possbile i'll try my best to make this a "static" class. 
+   *
+   * if the service fails it won't retry or anything just none of
+   * the functionality will work.
+   *
+   * TODO handle failure properly.
+   */
   public GDriveService()
   {
     try
@@ -79,6 +88,8 @@ public class GDriveService
     }
   }
 
+  //videos folder and photos folder needed to in the drive so we can perform downloads.
+  //TODO handle failure properly.
   private void initFolders()
   {
     try{
@@ -158,7 +169,14 @@ public class GDriveService
   /**
    * Gets the videos for app as a list of files.
    *
-   * @return files list of videos for app as google drive files.
+   * this will return google drive files of
+   * files in the drive under MAIN_FOLDER_NAME/videos/ in the drive.
+   *
+   * if it fails it will return an empty list.
+   *
+   * DONT confuse this File with java.io.File!
+   *
+   * @return list of videos for app as google drive files or empty list.
    */
   public List<File> getVideoFiles()
   {
@@ -176,6 +194,24 @@ public class GDriveService
     }
   }
 
+  /**
+   * Downlaods a file to the applications media folder given a google drive file id.
+   *
+   * the applications media folder is specified in application.properties downloadPath
+   * property.
+   *
+   * if you provide a folder paramter you must ensure that the directory exists!
+   * you must also be sure to include a / at the end.
+   *
+   * for example gds.downloadFile(someId, "videos/");
+   *
+   * if the folder paramter is not provided it will download directly into 
+   * the media folder.
+   *
+   *
+   * @param driveFileId id of the file in the drive.
+   * @param folder sub directory you want to place file in. 
+   */
   public void downloadFile(String driveFileId) { downloadFile(driveFileId, ""); }
   public void downloadFile(String driveFileId, String folder)
   {
