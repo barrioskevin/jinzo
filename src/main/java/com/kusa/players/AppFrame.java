@@ -1,5 +1,6 @@
 package com.kusa.players;
 
+import com.kusa.Config;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -26,8 +27,8 @@ public class AppFrame extends JFrame
 
   public AppFrame()
   {
-    leftPanel = new SidePanel("/home/kusa/UwU/jinzo/src/main/resources/logo-stack.png");
-    rightPanel = new SidePanel("/home/kusa/UwU/jinzo/src/main/resources/logo-stack.png");
+    leftPanel = new SidePanel(Config.getProperty("downloadPath") + "photos/logo-stack.png");
+    rightPanel = new SidePanel(Config.getProperty("downloadPath") + "photos/logo-stack.png");
     middlePanel = new VideoPanel();
 
     setUndecorated(true);
