@@ -22,12 +22,20 @@ import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import com.kusa.Config;
 
 /**
  * Class that will connect to the google drive.
+ *
+ * it finds a folder with the name of 
+ * MAIN_FOLDER_NAME in your google drive.
+ * sub directories used: 
+ *  - "videos/"
+ *  - "pictures/"
  *
  * try to keep only one instance of this.
  */
@@ -37,6 +45,7 @@ public class GDriveService
   private Drive drive;
   private String jinzoId; // id of folder we need. 
   private static final String googleAppName = "Jinzo";
+  private static final String MAIN_FOLDER_NAME = "JINZO";
   private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
   private File jinzoFolder;
@@ -51,8 +60,8 @@ public class GDriveService
    *
    * credentials is a class getresource path.
    */
-  private static final String TOKEN_STORAGE_PATH = "/home/kusa/UwU/jinzo/tokens/";
-  private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
+  private static final String TOKEN_STORAGE_PATH = Config.getProperty("tokenStoragePath");
+  private static final String CREDENTIALS_FILE_PATH = Config.getProperty("googleCredentialsPath");
 
 
 
@@ -78,7 +87,7 @@ public class GDriveService
       List<File> files = result.getFiles();
       for(File file : files)
       {
-        if(file.getName().equals("JINZO"))
+        if(file.getName().equals(MAIN_FOLDER_NAME))
         {
           jinzoFolder = file;
           videoFolder = null;
@@ -100,12 +109,13 @@ public class GDriveService
   }
 
 
-  private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException
+  private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException, FileNotFoundException
   {
-    InputStream in = GDriveService.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-    if(in == null)
+    java.io.File creds = new java.io.File(CREDENTIALS_FILE_PATH);
+    if(!creds.exists())
       throw new FileNotFoundException("Resouce not found: " + CREDENTIALS_FILE_PATH); 
 
+    FileInputStream in = new FileInputStream(creds);
     GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
     GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
@@ -160,13 +170,14 @@ public class GDriveService
     }
     catch(Exception e)
     {
-      System.out.println("GDriveService: Failed to get jinzo folder with the current id." + e); 
-      System.out.println("JINZO ID: " + jinzoId);
+      System.out.println("GDriveService: Failed to get main folder name with the current id." + e); 
+      System.out.println("FILE ID: " + jinzoId);
       return Collections.emptyList();
     }
   }
 
-  public void downloadFile(String driveFileId)
+  public void downloadFile(String driveFileId) { downloadFile(driveFileId, ""); }
+  public void downloadFile(String driveFileId, String folder)
   {
     try
     {
@@ -178,7 +189,7 @@ public class GDriveService
       }
       ByteArrayOutputStream os = new ByteArrayOutputStream();
       drive.files().get(driveFileId).executeMediaAndDownloadTo(os);
-      FileOutputStream fos = new FileOutputStream("/home/kusa/UwU/jinzo/src/main/resources/drive/" + file.getName());
+      FileOutputStream fos = new FileOutputStream(Config.getProperty("downloadPath") + folder + file.getName());
       os.writeTo(fos);
     }
     catch(Exception e)

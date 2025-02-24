@@ -1,4 +1,5 @@
 package com.kusa.service;
+import com.kusa.Config;
 import java.io.File;
 import java.util.Set;
 import java.util.HashSet;
@@ -8,8 +9,7 @@ public class LocalService
 
   public static Set<String> getDownloadedVideoNames()
   {
-    String downloadDir = "/home/kusa/UwU/jinzo/src/main/resources/drive/";
-    File dir = new File(downloadDir);
+    File dir = new File(Config.getProperty("downloadPath") + "videos/");
     File[] files = dir.listFiles();
     Set<String> names = new HashSet<>();
     if (files != null)
