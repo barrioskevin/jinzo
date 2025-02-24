@@ -16,9 +16,14 @@ public class App
   public static void main(String args[])
   {
     GDriveService gds = new GDriveService();
+
     new AppFrame();
 
     Timer downloadTimer = new Timer();
     downloadTimer.schedule(new VideoDownloaderTask(gds), 1000, 60000);
+
+    System.out.println(Config.getProperty("downloadPath"));
+    System.out.println(Config.getProperty("tokenStoragePath"));
+    System.out.println(Config.getProperty("googleCredentialsPath"));
   }
 }

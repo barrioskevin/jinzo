@@ -11,7 +11,6 @@ public class ImageSwitchTask extends TimerTask {
     this.panel = panel;
     this.imagePath = path;
   }
-//"/home/kusa/UwU/jinzo/src/main/resources/wallpaper.jpg"
 
   @Override
   public void run()

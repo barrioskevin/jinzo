@@ -21,7 +21,7 @@ public class VideoDownloaderTask extends TimerTask {
     List<File> videos = gds.getVideoFiles();
     for(File video : videos)
     {
-      gds.downloadFile(video.getId());
+      gds.downloadFile(video.getId(), "videos/");
     }
   }
 }
