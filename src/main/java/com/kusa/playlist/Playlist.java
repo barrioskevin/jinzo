@@ -12,6 +12,7 @@ public interface Playlist {
   boolean add(String mrl);
   boolean remove(String mrl);
   boolean remove(int pIndex);
+  boolean clear();
 
   //true if mrl is in playlist.
   boolean contains(String mrl);
