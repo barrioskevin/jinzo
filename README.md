@@ -12,7 +12,7 @@ The following are required to install and run this application.
 - Unix ( The app installs using the $HOME enviornment variable and it doesn't account for systems that won't have that )
 - Java 11 (OpenJDK 11 or higher?)
 - VLC 3.x
-- Maven (for handling dependencies)
+- Maven 3.6.0 + (for handling dependencies)
 - Google Application: `credentials.json` [*OPTIONAL*]
 
 ## Installation Steps
