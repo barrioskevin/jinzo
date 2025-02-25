@@ -23,11 +23,25 @@ public class CircularQueuePlaylist implements Playlist
    *
    * this playlist defaults to loading in all downloaded videos.
    */
-  public CircularQueuePlaylist()
+  public CircularQueuePlaylist(List<String> initialMRLS)
   {
-    mrls = new ArrayList<>(LocalService.getVideoMRLS());
+    mrls = new ArrayList<>(initialMRLS);
     mrlSet = new HashSet<>(mrls);
     index = 0;
+  }
+
+  @Override
+  public boolean clear()
+  {
+    if(mrls == null || mrls.isEmpty())
+      return false;
+    if(mrlSet == null || mrlSet.isEmpty())
+      return false;
+
+    mrls.clear();
+    mrlSet.clear();
+    index = 0;
+    return true;
   }
 
   /**
@@ -157,7 +171,9 @@ public class CircularQueuePlaylist implements Playlist
    * @return int representing playlist's index.
    */
   @Override
-  public int index() { return this.index; }
+  public int index() { 
+    return ((this.index >= mrls.size()) ? 0 : this.index); 
+  }
 
 
   /**
