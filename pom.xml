@@ -188,6 +188,9 @@
                     <exclude>META-INF/AL2.0</exclude>
                     <exclude>META-INF.versions.9.module-info</exclude>
                     <exclude>META-INF/*.module-info</exclude>
+                    <exclude>resources/**</exclude>
+                    <exclude>drive/**</exclude>
+                    <exclude>application.properties</exclude>
                   </excludes>
                 </filter>
               </filters>
