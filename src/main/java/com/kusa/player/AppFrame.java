@@ -1,4 +1,7 @@
-package com.kusa.players;
+package com.kusa.player;
+
+import com.kusa.playlist.Playlist; 
+import com.kusa.playlist.CircularQueuePlaylist; 
 
 import com.kusa.Config;
 import java.util.Timer;
@@ -56,7 +59,7 @@ public class AppFrame extends JFrame
   {
     leftPanel = new SidePanel(Config.getProperty("downloadPath") + "photos/logo-stack.png");
     rightPanel = new SidePanel(Config.getProperty("downloadPath") + "photos/logo-stack.png");
-    middlePanel = new VideoPanel();
+    middlePanel = new VideoPanel(new CircularQueuePlaylist());
 
     setUndecorated(true);
     addWindowListener(new WindowAdapter() {

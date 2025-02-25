@@ -1,4 +1,4 @@
-package com.kusa.players;
+package com.kusa.player;
 
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Timer;
 import com.kusa.PlaylistUpdaterTask;
+import com.kusa.playlist.Playlist;
 
 
 /**
@@ -28,9 +29,9 @@ public class VideoPanel extends EmbeddedMediaPlayerComponent
    * class eventually so we don't have to manage the playlist 
    * within a video panel.
    */
-  public VideoPanel()
+  public VideoPanel(Playlist playlist_)
   {
-    playlist = new Playlist();
+    playlist = playlist_;
     setOpaque(true);
 
     //we setup a event adapter to automatically play the next video in a playlist
@@ -39,7 +40,10 @@ public class VideoPanel extends EmbeddedMediaPlayerComponent
       @Override
       public void finished(MediaPlayer mp)
       {
-        mediaPlayer().submit(() -> mediaPlayer().media().play(playlist.next()));
+        final int idx = playlist.index();
+        final String mrl = playlist.next();
+        mediaPlayer().submit(() -> mediaPlayer().media().play(mrl));
+        System.out.printf("NOW PLAYING %d : %s \n", idx, mrl);
       }
     });
 
@@ -50,7 +54,7 @@ public class VideoPanel extends EmbeddedMediaPlayerComponent
   }
 
   /**
-   * Plays the current media.
+   * Advances the playlist and plays the next media.
    *
    * called by the main app to start the video panel. 
    *
@@ -60,7 +64,10 @@ public class VideoPanel extends EmbeddedMediaPlayerComponent
    */
   public void play()
   {
-    mediaPlayer().media().play(playlist.next());
+    final int idx = playlist.index();
+    final String mrl = playlist.next();
+    mediaPlayer().media().play(mrl);
+    System.out.printf("NOW STARTING %d : %s \n", idx, mrl);
   }
 
 }

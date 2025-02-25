@@ -1,4 +1,4 @@
-package com.kusa.players;
+package com.kusa.player;
 
 import java.awt.Graphics;
 import java.awt.Color;
