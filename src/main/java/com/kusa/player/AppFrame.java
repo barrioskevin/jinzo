@@ -55,11 +55,11 @@ public class AppFrame extends JFrame
    *  - uses the GraphicsDevice to enable full screen on this frame.
    *  - starts the video panel.
    */
-  public AppFrame()
+  public AppFrame(Playlist videoPanelPlaylist)
   {
-    leftPanel = new SidePanel(Config.getProperty("downloadPath") + "photos/logo-stack.png");
-    rightPanel = new SidePanel(Config.getProperty("downloadPath") + "photos/logo-stack.png");
-    middlePanel = new VideoPanel(new CircularQueuePlaylist());
+    leftPanel = new SidePanel(Config.getProperty("downloadPath") + "photos/left2.png");
+    rightPanel = new SidePanel(Config.getProperty("downloadPath") + "photos/right.png");
+    middlePanel = new VideoPanel(videoPanelPlaylist);
 
     setUndecorated(true);
     addWindowListener(new WindowAdapter() {
