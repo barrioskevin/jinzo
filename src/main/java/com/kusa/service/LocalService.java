@@ -7,7 +7,10 @@ import java.util.HashSet;
 public class LocalService
 {
 
+  //aliases
+  public static final String mediaPath = Config.getProperty("downloadPath");
   public static final String videosPath = Config.getProperty("downloadPath") + "videos/";
+  public static final String photosPath = Config.getProperty("downloadPath") + "photos/";
 
   /**
    * Returns true if file exists on the local machine.
@@ -39,5 +42,21 @@ public class LocalService
     }
     return names;
   }
+
+  public static Set<String> getPhotoMRLS()
+  {
+    File dir = new File(photosPath);
+    File[] files = dir.listFiles();
+    Set<String> names = new HashSet<>();
+    if (files != null)
+    {
+      for(File file : files)
+      {
+        names.add(file.getAbsolutePath());
+      }
+    }
+    return names;
+  }
+
 
 }
