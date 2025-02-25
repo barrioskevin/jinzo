@@ -50,6 +50,7 @@ public class Config
         //it requires recompilation upon editing.
         props.load(Config.class.getResourceAsStream("/application.properties"));
         propsLoaded = true;
+        System.out.println("Loaded local properties.");
       }catch (Exception e){
         System.out.println("Couldnt find local properties");
       }
@@ -64,12 +65,17 @@ public class Config
         File propertyFile = new File(appPath + "application.properties");
         if(!propertyFile.exists())
         {
+          System.out.println("writing a default properties file.");
           Files.createFile(Paths.get(propertyFile.getAbsolutePath()));
           writeDefaultAppProperties(propertyFile);
-          props.load(new FileReader(propertyFile));
         }
+        props.load(new FileReader(propertyFile));
+        System.out.printf("[SUCSSESS] loaded properties file: %s\n", propertyFile.getAbsolutePath());
       }
 
+      System.out.println(getProperty("downloadPath"));
+      System.out.println(getProperty("tokenStoragePath"));
+      System.out.println(getProperty("googleCredentialsPath"));
       File driveFolder = new File(getProperty("downloadPath"));
       if(!driveFolder.exists())
         if(!driveFolder.mkdirs())
@@ -100,6 +106,8 @@ public class Config
     } catch (Exception e)
     {
       System.out.println("STARTUP FAILED!" + e);
+      System.out.println(e.getMessage());
+      e.printStackTrace();
       System.exit(1);
     }
   }
@@ -117,7 +125,7 @@ public class Config
    */
   public static String getProperty(String propName) 
   { 
-    return props == null ? "" : props.getProperty(propName); 
+    return ((props == null) ? "" : props.getProperty(propName));
   }
 
   /*

@@ -10,7 +10,7 @@ This project is a Java application that utilizes vlcj and Swing to create an eng
 While I plan on releasing a "release" version of this project, for now the only way to use is to build from source.
 The following are required to install and run this application.
 - Unix ( The app installs using the $HOME enviornment variable and it doesn't account for systems that won't have that )
-- Java 17 (OpenJDK 17 or higher?)
+- Java 11 (OpenJDK 11 or higher?)
 - VLC 3.x
 - Maven (for handling dependencies)
 - Google Application: `credentials.json` [*OPTIONAL*]
