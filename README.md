@@ -1,7 +1,8 @@
 # Engaging Video Player
 
 This project is a Java application that utilizes vlcj and Swing to create an engaging video player. The goal is to create a media player that will play media with additional side panels that could be used to display extra content.
-
+![image](https://github.com/user-attachments/assets/7fd40dee-1413-4e7e-b3b8-32c4ca94a4f1)
+*screenshot of engagment player tailored for a local business*
 # Setup Instructions
 
 ## Prerequisites 
