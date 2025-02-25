@@ -1,5 +1,5 @@
 package com.kusa;
-import com.kusa.players.AppFrame;
+import com.kusa.player.AppFrame;
 
 import com.kusa.service.GDriveService;
 import com.kusa.service.LocalService;
