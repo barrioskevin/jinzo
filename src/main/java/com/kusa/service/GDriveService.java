@@ -50,6 +50,7 @@ public class GDriveService
 
   private File jinzoFolder;
   private File videoFolder;
+  private File photoFolder;
 
   //we only use read only. app only needs to be able to download the videos.
   private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE_READONLY);
@@ -102,6 +103,7 @@ public class GDriveService
         {
           jinzoFolder = file;
           videoFolder = null;
+          photoFolder = null;
         }
       }
       FileList result2 = drive.files().list().setQ("'" + jinzoFolder.getId() + "' in parents").setFields("files(id, name, parents)").execute();
@@ -112,9 +114,20 @@ public class GDriveService
           videoFolder = file; 
         }
       }
+
+      FileList result3 = drive.files().list().setQ("'" + jinzoFolder.getId() + "' in parents").setFields("files(id, name, parents)").execute();
+      for(File file : result3.getFiles())
+      {
+        if(file.getName().equals("photos") && photoFolder == null)
+        {
+          photoFolder = file;
+        }
+      }
     }
     catch(Exception e)
     {
+      System.out.println("GDS FAILURE: FAILED TO FIND NEEDED FOLDERS IN DRIVEE!!!");
+      e.printStackTrace();
       return;
     }
   }
@@ -194,6 +207,21 @@ public class GDriveService
     }
   }
 
+  public List<File> getPhotoFiles()
+  {
+    try
+    {
+      FileList result = drive.files().list().setQ("'" + photoFolder.getId() + "' in parents").setFields("files(id, name)").execute();
+      return result.getFiles() == null ? Collections.emptyList() : result.getFiles();
+    }
+    catch(Exception e)
+    {
+      System.out.println("GDS FAILURE: Failed to get photo folder files!!");
+      e.printStackTrace();
+      return Collections.emptyList();
+    }
+  }
+
   /**
    * Downlaods a file to the applications media folder given a google drive file id.
    *
@@ -218,7 +246,7 @@ public class GDriveService
     try
     {
       File file = drive.files().get(driveFileId).execute();
-      if(LocalService.getVideoMRLS().contains(Config.getProperty("downloadPath") + folder + file.getName()))
+      if(new java.io.File(Config.getProperty("downloadPath") + folder + file.getName()).exists())
       {
         System.out.println("Skipping this download..." + file.getName());
         return;
