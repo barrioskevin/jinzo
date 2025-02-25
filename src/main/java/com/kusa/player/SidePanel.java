@@ -59,7 +59,7 @@ public class SidePanel extends JPanel
       System.out.println("IMAGE " + path + " FAILED TO LOAD");
       scaledImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
       Graphics g = scaledImage.getGraphics();
-      g.setColor(Color.BLUE);
+      g.setColor(Color.BLACK);
       g.fillRect(0, 0, width, height);
       g.dispose();
     }
@@ -98,7 +98,6 @@ public class SidePanel extends JPanel
     {
       System.out.println("FAILED TO SET A NEW IMAGE");
     }
-    return;
   }
 
 }
