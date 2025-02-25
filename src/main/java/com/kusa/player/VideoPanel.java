@@ -8,7 +8,6 @@ import com.kusa.service.LocalService;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Timer;
-import com.kusa.PlaylistUpdaterTask;
 import com.kusa.playlist.Playlist;
 
 
@@ -46,11 +45,6 @@ public class VideoPanel extends EmbeddedMediaPlayerComponent
         System.out.printf("NOW PLAYING %d : %s \n", idx, mrl);
       }
     });
-
-    //we also start a task here for managing our playlist
-    //TODO this is probably not the best place to do this!!!
-    Timer t = new Timer();
-    t.schedule(new PlaylistUpdaterTask(playlist), 1000, 60000);
   }
 
   /**
