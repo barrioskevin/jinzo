@@ -1,6 +1,6 @@
 package com.kusa;
 
-import com.kusa.players.Playlist;
+import com.kusa.playlist.Playlist;
 import com.kusa.service.LocalService;
 
 import java.util.TimerTask;
@@ -21,9 +21,9 @@ public class PlaylistUpdaterTask extends TimerTask
   @Override
   public void run()
   {
-    Set<String> downloadedVideos = LocalService.getDownloadedVideoNames();
+    Set<String> downloadedVideos = LocalService.getVideoMRLS();
     for(String video : downloadedVideos)
-      if(!playlist.hasTitle(video))
-        playlist.addVideoMRL(video);
+      if(!playlist.contains(video))
+        playlist.add(video);
   }
 }

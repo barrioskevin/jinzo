@@ -9,7 +9,7 @@ import com.kusa.service.GDriveService;
 
 public class VideoDownloaderTask extends TimerTask {
   private GDriveService gds;
-  public VideoDownloaderTask(GDriveService gds){this.gds = gds;}
+  public VideoDownloaderTask(GDriveService gds){ this.gds = gds; }
 
   /*
    * pull videos and download them.

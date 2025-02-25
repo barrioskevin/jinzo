@@ -1,7 +1,7 @@
 package com.kusa;
 
 import java.util.TimerTask;
-import com.kusa.players.SidePanel;
+import com.kusa.player.SidePanel;
 
 public class ImageSwitchTask extends TimerTask {
   private SidePanel panel;
