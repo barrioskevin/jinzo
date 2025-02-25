@@ -218,7 +218,7 @@ public class GDriveService
     try
     {
       File file = drive.files().get(driveFileId).execute();
-      if(LocalService.getDownloadedVideoNames().contains(file.getName()))
+      if(LocalService.getVideoMRLS().contains(Config.getProperty("downloadPath") + folder + file.getName()))
       {
         System.out.println("Skipping this download..." + file.getName());
         return;
