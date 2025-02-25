@@ -1,0 +1,184 @@
+package com.kusa.playlist;
+
+
+import com.kusa.Config; 
+import com.kusa.service.LocalService;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
+
+/**
+ * Class respresenting a circular queue playlist.
+ *
+ */
+public class CircularQueuePlaylist implements Playlist
+{
+  List<String> mrls;
+  Set<String> mrlSet;
+  private int index;
+
+  /**
+   * Constructa a new circular queue playlist.
+   *
+   * this playlist defaults to loading in all downloaded videos.
+   */
+  public CircularQueuePlaylist()
+  {
+    mrls = new ArrayList<>(LocalService.getVideoMRLS());
+    mrlSet = new HashSet<>(mrls);
+    index = 0;
+  }
+
+  /**
+   * Adds the mrl to the end of playlist.
+   *
+   * we make sure the file actually exists in order
+   * to prevent any potential issues ahead of time.
+   * 
+   * @param mrl Media Resource Link to be added.
+   * @return true if mrl was sucessfully added to playlist.
+   */
+  @Override
+  public boolean add(String mrl)
+  {
+    if(!LocalService.fileExists(mrl))
+      return false;
+
+    mrls.add(mrl);
+    mrlSet.add(mrl);
+    return true;
+  }
+
+  @Override
+  public boolean remove(String mrl)
+  {
+    int index_ = mrls.indexOf(mrl); 
+    if(index_ < 0) 
+    {
+      System.out.println("Cant remove file from playlist. " 
+                        + mrl + " does not exist in this playlist");
+      return false;
+    }
+
+    return remove(index_);
+  }
+
+  @Override
+  public boolean remove(int pIndex)
+  {
+    try
+    {
+      String mrl = mrls.get(pIndex);
+      mrls.remove(pIndex);
+      mrlSet.remove(mrl);
+      if(pIndex <= this.index)
+        this.index--;
+    }
+    catch(Exception e)
+    {
+      System.out.println("Couldnt remove file from playlist!");
+      e.printStackTrace();
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Returns true if the MRL is included in the playlist.
+   *
+   * @param mrl Media Resource Link to check if in playlist.
+   * @return true if mrl exists in this playlist.
+   */
+  @Override
+  public boolean contains(String mrl)
+  {
+    return mrlSet.contains(mrl);
+  }
+  
+  /**
+   * Updates the playlist queue and returns the new current title.
+   *
+   * this will loop back to 0 if we reached the end.
+   * if the playlist is empty an empty string will be returned.
+   *
+   * @return String of MRL for next media in playlist or empty. 
+   */
+  @Override
+  public String next()
+  {
+    if(mrls.isEmpty())
+      return "";
+
+    if(index >= mrls.size())
+      index = 0;
+
+    return mrls.get(index++);
+  }
+
+  /**
+   * Skips to the index specified if possible.
+   *
+   * because its a circular queue. if you pass an index
+   * greater than the acttual playlists length, you will
+   * still get updated to a valid position in the playlist it
+   * would just keep cycling from the beg.
+   *
+   * @return the mrl of new current title. or empty if playlist empty.
+   */
+  @Override
+  public String skipTo(int pIndex)
+  {
+    if(mrls.isEmpty())
+      return "";
+
+    index = pIndex % mrls.size();
+    return mrls.get(index++);
+  }
+
+
+  /**
+   * Gets the MRL of current media playing.
+   *
+   * returns empty string if playlist empty.
+   *
+   * be careful calling this right after next, it will
+   * be two different mrls.
+   *
+   * @return String of MRL at index of playlist. 
+   */
+  @Override
+  public String current() { return ((mrls.get(index) == null) ? "" : mrls.get(index)); }
+
+  /**
+   * Gets the index of queued track in playlist.
+   *
+   * @return int representing playlist's index.
+   */
+  @Override
+  public int index() { return this.index; }
+
+
+  /**
+   * Returns the track list in the order matching playlist.
+   *
+   * @return UNMODIFIABLE list of mrls in the playlist.
+   */
+  @Override
+  public List<String> trackList()
+  {
+    //maybe just return mrls?
+    return List.copyOf(mrls);
+  }
+
+  /**
+   * Returns the number of tracks queued in the playlist.
+   *
+   * @return int representing number of tracks in the playlists queue.
+   */
+  @Override
+  public int size() { return mrls.size(); } 
+
+}
+
