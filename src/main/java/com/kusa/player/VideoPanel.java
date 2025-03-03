@@ -1,6 +1,7 @@
 package com.kusa.player;
 
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
+import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
 import uk.co.caprica.vlcj.player.base.events.MediaPlayerEvent;
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
@@ -17,7 +18,7 @@ import com.kusa.playlist.Playlist;
  * this class extends vlcjs embedded media player component for
  * access to vlc bindings.
  */
-public class VideoPanel extends EmbeddedMediaPlayerComponent
+public class VideoPanel extends EmbeddedMediaPlayerComponent 
 {
   private Playlist playlist;
   
@@ -30,6 +31,7 @@ public class VideoPanel extends EmbeddedMediaPlayerComponent
    */
   public VideoPanel(Playlist playlist_)
   {
+    super();
     playlist = playlist_;
     setOpaque(true);
 
@@ -41,7 +43,8 @@ public class VideoPanel extends EmbeddedMediaPlayerComponent
       {
         final int idx = playlist.index();
         final String mrl = playlist.next();
-        mediaPlayer().submit(() -> mediaPlayer().media().play(mrl));
+
+        mediaPlayer().submit(() -> mediaPlayer().media().play(mrl, "--avcodec-hw=mmal", "--no-xlib", "--no-osd", "--no-interact", "--no-video-filter", "--quiet"));
         System.out.printf("NOW PLAYING %d : %s \n", idx, mrl);
       }
     });
