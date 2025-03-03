@@ -3,3 +3,4 @@ src/main/resources/**
 tokens/**
 dependency-reduced-pom.xml
 *.xcf
+x.txt
