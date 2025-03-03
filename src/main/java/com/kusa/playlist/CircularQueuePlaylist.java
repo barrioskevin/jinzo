@@ -18,8 +18,9 @@ public class CircularQueuePlaylist implements Playlist
   Set<String> mrlSet;
   private int index;
 
+  public CircularQueuePlaylist() { this(new ArrayList<String>()); }
   /**
-   * Constructa a new circular queue playlist.
+   * Constructs a new circular queue playlist.
    *
    * this playlist defaults to loading in all downloaded videos.
    */
@@ -163,7 +164,12 @@ public class CircularQueuePlaylist implements Playlist
    * @return String of MRL at index of playlist. 
    */
   @Override
-  public String current() { return ((mrls.get(index) == null) ? "" : mrls.get(index)); }
+  public String current() 
+  { 
+    if(size() > 0 && mrls.get(index) != null)
+      return mrls.get(index);
+    return "";
+  }
 
   /**
    * Gets the index of queued track in playlist.
@@ -195,6 +201,4 @@ public class CircularQueuePlaylist implements Playlist
    */
   @Override
   public int size() { return mrls.size(); } 
-
 }
-
