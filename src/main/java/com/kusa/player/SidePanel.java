@@ -47,10 +47,9 @@ public class SidePanel extends JPanel
    */
   public SidePanel(String path, int width, int height)
   {
-    //TODO Handle failure properly!!!
-      
+    //if we fail to read the image this panel will just
+    //be black.
     setLayout(new BorderLayout());
-
     try{
       originalImage = ImageIO.read(new File(path));
       scaledImage = originalImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
@@ -99,5 +98,4 @@ public class SidePanel extends JPanel
       System.out.println("FAILED TO SET A NEW IMAGE");
     }
   }
-
 }
