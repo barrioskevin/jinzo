@@ -1,8 +1,5 @@
 package com.kusa.player;
 
-import com.kusa.playlist.Playlist; 
-import com.kusa.playlist.CircularQueuePlaylist; 
-
 import com.kusa.Config;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -43,23 +40,22 @@ public class AppFrame extends JFrame
   private JPanel contentPane;
 
   /**
-   * Constructs the engagment frame.
+   * Constructs the engagment frame from two side panels and a video panel.
    * 
    * While right now this engagment frame is handling alot I eventually want to add
    * paramters for this constructor insttead of internally creating the panels.
    *
    * Operations:
-   *  - Constructs needed panels. 2 side panels and 1 video panel. 
+   *  - sets the private variables.
    *  - Constructs the content pane where panels will be added.
-   *  - sets frame properties such as underorated and visible to true.
-   *  - uses the GraphicsDevice to enable full screen on this frame.
-   *  - starts the video panel.
+   *  - add in all the panels to this engagment frames layout.
+   *  - sets frame properties such as undecorated and visible to true.
    */
-  public AppFrame(Playlist videoPanelPlaylist)
+  public AppFrame(SidePanel leftPanel, SidePanel rightPanel, VideoPanel middlePanel)
   {
-    leftPanel = new SidePanel(Config.getProperty("downloadPath") + "photos/left2.png");
-    rightPanel = new SidePanel(Config.getProperty("downloadPath") + "photos/right.png");
-    middlePanel = new VideoPanel(videoPanelPlaylist);
+    this.leftPanel = leftPanel;
+    this.rightPanel = rightPanel;
+    this.middlePanel = middlePanel;
 
     setUndecorated(true);
     addWindowListener(new WindowAdapter() {
@@ -73,7 +69,6 @@ public class AppFrame extends JFrame
 
     contentPane = new JPanel();
 
-    //contentPane.setLayout(new GridLayout(1, 3, 0, 0));
     contentPane.setLayout(new BorderLayout());
 
     contentPane.add(leftPanel, BorderLayout.WEST);
@@ -82,15 +77,11 @@ public class AppFrame extends JFrame
 
     setContentPane(contentPane);
     setVisible(true);
-      
-    device.setFullScreenWindow(this);
-    middlePanel.play();
-
-    /*
-    System.out.println("VIDEO FRAME CREATED, SHOWING CONTENT");
-    System.out.println("Left Panel" + leftPanel.getSize());
-    System.out.println("video " + middlePanel.getSize());
-    System.out.println("Right Panel" + rightPanel.getSize());
-    */
   }
+
+  /** Toggles full screen on systems main device.
+   *
+   * displays this frame on full screen or returns to windowed.
+   */
+  public void fullscreen(){ device.setFullScreenWindow(this); }
 }
