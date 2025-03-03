@@ -20,13 +20,20 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
+import java.util.LinkedList;
+import java.util.ArrayList;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import com.kusa.Config;
+import com.kusa.util.PathedFile;
+import org.apache.commons.io.FileUtils;
 
 /**
  * Class that will connect to the google drive.
@@ -47,10 +54,10 @@ public class GDriveService
   private static final String googleAppName = "Jinzo";
   private static final String MAIN_FOLDER_NAME = "JINZO";
   private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
+  private static final String FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
 
   private File jinzoFolder;
-  private File videoFolder;
-  private File photoFolder;
+  private final boolean valid; 
 
   //we only use read only. app only needs to be able to download the videos.
   private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE_READONLY);
@@ -74,27 +81,47 @@ public class GDriveService
    * the functionality will work.
    *
    * TODO handle failure properly.
+   *  - currently using valid flag.
    */
   public GDriveService()
   {
+    boolean valid = false;
     try
     {
       final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
       drive = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT)).setApplicationName(googleAppName).build();
-      initFolders();
+      valid = findAppFolder();
+      if(!valid)
+        System.out.println("Failed to launch gdrive service. COULDNT FIND APP FOLDER");
     }
     catch(Exception e)
     {
       System.out.println("Failed to launch gdrive service." + e);
+      valid = false;
+    }
+    finally
+    {
+      this.valid = valid;
     }
   }
 
-  //videos folder and photos folder needed to in the drive so we can perform downloads.
-  //TODO handle failure properly.
-  private void initFolders()
+  /**
+   * Returns true if you can safely use this service.
+   */
+  public boolean isValid() { return this.valid; }
+  
+
+  /**
+   * Returns true if jinzo folder is found in drive.
+   *
+   * sets jinzo folder to the google drive's corresponding folder file.
+   *
+   * @return true if jinzo folder is found and will not be null.
+   *         false if jinzo folder will be null after this method.
+   */
+  private boolean findAppFolder()
   {
     try{
-      //setPageSize(pageSize).   nextPageToken
       FileList result = drive.files().list().setQ("mimeType = 'application/vnd.google-apps.folder'").setFields("files(id, name)").execute();
       List<File> files = result.getFiles();
       for(File file : files)
@@ -102,33 +129,16 @@ public class GDriveService
         if(file.getName().equals(MAIN_FOLDER_NAME))
         {
           jinzoFolder = file;
-          videoFolder = null;
-          photoFolder = null;
+          return true;
         }
       }
-      FileList result2 = drive.files().list().setQ("'" + jinzoFolder.getId() + "' in parents").setFields("files(id, name, parents)").execute();
-      for(File file : result2.getFiles())
-      {
-        if(file.getName().equals("videos") && videoFolder == null)
-        {
-          videoFolder = file; 
-        }
-      }
-
-      FileList result3 = drive.files().list().setQ("'" + jinzoFolder.getId() + "' in parents").setFields("files(id, name, parents)").execute();
-      for(File file : result3.getFiles())
-      {
-        if(file.getName().equals("photos") && photoFolder == null)
-        {
-          photoFolder = file;
-        }
-      }
+      return false;
     }
     catch(Exception e)
     {
       System.out.println("GDS FAILURE: FAILED TO FIND NEEDED FOLDERS IN DRIVEE!!!");
       e.printStackTrace();
-      return;
+      return false;
     }
   }
 
@@ -149,27 +159,46 @@ public class GDriveService
 
     LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
     Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+    System.out.printf("YOUR DRIVE CREDENTIALS EXPIRES IN %d SECONDS.\n", credential.getExpiresInSeconds());
     return credential;
   }
 
+
   /**
-   * Gets a list of files from the drive.
+   * Gets a list of pathed files in application named folder from the drive.
    *
    * we are handling the exception internally right now
+   *
    * idk if thats the best approach but if any failure occurs
    * it will return an empty list.
    *
-   * @param pageSize number of pages to retrieve.
-   * @return List of google drive files.
+   * @return List of google drive files in application folder (JINZO).
    */
-  public List<File> getFileList(int pageSize)
+  public List<PathedFile> getFileList()
   {
     try
     {
-      //setPageSize(pageSize).   nextPageToken
-      FileList result = drive.files().list().setFields("files(id, name, parents, description)").execute();
       //Google drive File
-      List<File> files = result.getFiles();
+      Queue<PathedFile> folders = new LinkedList<>(List.of(new PathedFile(jinzoFolder, "")));
+      List<PathedFile> files = new ArrayList<>();
+      while(!folders.isEmpty())
+      {
+        PathedFile pf = folders.poll();
+        File folder = pf.file();
+        String path = pf.path();
+        String id = folder.getId();
+
+        String query = String.format("'%s' in parents and trashed = false",id);
+        FileList result = drive.files().list().setQ(query).setFields("files(id, name, parents, description, mimeType)").execute();
+        List<File> folderFiles = result.getFiles();
+        for(File file : folderFiles)
+        {
+          if(file.getMimeType().equals(FOLDER_MIME_TYPE))
+            folders.add(new PathedFile(file, path + file.getName() + "/"));
+          else
+            files.add(new PathedFile(file, path));
+        }
+      }
       return files;
     }
     catch(Exception e)
@@ -180,86 +209,75 @@ public class GDriveService
   }
 
   /**
-   * Gets the videos for app as a list of files.
+   * Downloads a PathedFile locally.
    *
-   * this will return google drive files of
-   * files in the drive under MAIN_FOLDER_NAME/videos/ in the drive.
+   * if file already exists we skip it.
    *
-   * if it fails it will return an empty list.
+   * download file with their path as destination.
    *
-   * DONT confuse this File with java.io.File!
+   * @param pf PathedFile we want to download. (pathed files are gdrive files)
    *
-   * @return list of videos for app as google drive files or empty list.
    */
-  public List<File> getVideoFiles()
+  public void downloadPathedFile(PathedFile pf)
   {
+    final String id = pf.file().getId();
+    final String path = Config.getProperty("downloadPath") + pf.path();
+    final String name = pf.file().getName();  
     try
     {
-
-      FileList result = drive.files().list().setQ("'" + videoFolder.getId() + "' in parents").setFields("files(id, name)").execute();
-      return result.getFiles() == null ? Collections.emptyList() : result.getFiles();
-    }
-    catch(Exception e)
-    {
-      System.out.println("GDriveService: Failed to get main folder name with the current id." + e); 
-      System.out.println("FILE ID: " + jinzoId);
-      return Collections.emptyList();
-    }
-  }
-
-  public List<File> getPhotoFiles()
-  {
-    try
-    {
-      FileList result = drive.files().list().setQ("'" + photoFolder.getId() + "' in parents").setFields("files(id, name)").execute();
-      return result.getFiles() == null ? Collections.emptyList() : result.getFiles();
-    }
-    catch(Exception e)
-    {
-      System.out.println("GDS FAILURE: Failed to get photo folder files!!");
-      e.printStackTrace();
-      return Collections.emptyList();
-    }
-  }
-
-  /**
-   * Downlaods a file to the applications media folder given a google drive file id.
-   *
-   * the applications media folder is specified in application.properties downloadPath
-   * property.
-   *
-   * if you provide a folder paramter you must ensure that the directory exists!
-   * you must also be sure to include a / at the end.
-   *
-   * for example gds.downloadFile(someId, "videos/");
-   *
-   * if the folder paramter is not provided it will download directly into 
-   * the media folder.
-   *
-   *
-   * @param driveFileId id of the file in the drive.
-   * @param folder sub directory you want to place file in. 
-   */
-  public void downloadFile(String driveFileId) { downloadFile(driveFileId, ""); }
-  public void downloadFile(String driveFileId, String folder)
-  {
-    try
-    {
-      File file = drive.files().get(driveFileId).execute();
-      if(new java.io.File(Config.getProperty("downloadPath") + folder + file.getName()).exists())
+      if(new java.io.File(path + name).exists())
       {
-        System.out.println("Skipping this download..." + file.getName());
+        System.out.println("Skipping this download..." + name);
         return;
       }
       ByteArrayOutputStream os = new ByteArrayOutputStream();
-      drive.files().get(driveFileId).executeMediaAndDownloadTo(os);
-      FileOutputStream fos = new FileOutputStream(Config.getProperty("downloadPath") + folder + file.getName());
+      drive.files().get(id).executeMediaAndDownloadTo(os);
+      FileOutputStream fos = new FileOutputStream(path + name);
       os.writeTo(fos);
     }
     catch(Exception e)
     {
-      System.out.println("download failed! " + e);
+      System.out.printf("download failed!\n name:%s\n id:%s", name, id);
+      System.out.println(e.getMessage());
+      e.printStackTrace();
       return;
+    }
+  }
+
+  public boolean sync()
+  {
+    try{
+      boolean changed = false;
+      Set<String> localMrls = LocalService.getLocalMRLS();
+      Set<String> driveMrls = new HashSet<>();
+      List<PathedFile> files = getFileList();
+      System.out.println("downloading files... ");
+      for(PathedFile pf : files)
+      {
+        LocalService.checkDir(Config.getProperty("downloadPath") + pf.path());
+        String mt = pf.file().getMimeType();
+        if(mt.contains("video") || mt.contains("image"))
+        {
+          downloadPathedFile(pf); //DOWNLOAD DRIVE FILE.
+          driveMrls.add(Config.getProperty("downloadPath") + pf.path() + pf.file().getName());
+          changed = true;
+        }
+      }
+      for(String mrl : localMrls)
+      {
+        if(!driveMrls.contains(mrl))
+        {
+          java.io.File file = new java.io.File(mrl);
+          FileUtils.delete(file); //DELETES LOCAL FILES
+          changed = true;
+        }
+      }
+      return changed;
+    } catch(Exception e)
+    {
+      System.out.println("FAILED TO PULL DRIVE FILES.");
+      e.printStackTrace();
+      return false;
     }
   }
 }
