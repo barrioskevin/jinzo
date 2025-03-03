@@ -46,7 +46,8 @@ Used to store the main applications `credentials.json`. Only needed if utilizing
 - downloadPath
 
 Used to load media such as photos and videos. This path is **required** as without it the app would have no photos or videos to load.
-You only need to specify the main folder ex: `$HOME/.jinzo/drive/` the app will automatically create the subdirectories `/videos/` and `/photos/`. You can store any vidoes or photos in those folders. 
+You only need to specify the main folder ex: `$HOME/.jinzo/drive/`. You can set your playlists to grab videos from anywhere but we are using this folder
+for easier management.
 
 If you want to define a custom properties file you can place a `applications.properties` file in the `src/main/resources` directory.
 The properties file defined in resources should only be used during developement since it should not be included in the JAR. This design
@@ -102,10 +103,10 @@ Sequential runs should automatically start the engagment player in fullscreen.
 - We uses services such as google drive service, to download content from the web to use in our application.
 - Services would allow us to dynamically update the content that our engagment player can play.
 
-## Tasks
+## Syncs 
 
 - This app currently relies on Java's Timer and TimerTasks to continously call services and update playlists. 
-- We have tasks responsible for downloading from drive service, merging download folder with playlist, and swithcing the content of a side panel. 
+- In the main method we setup a task to keep our local app's directory in sync with the google drive app folder this task also updates the playlists if any changes were found to keep them in sync with google drive.
 - This *might* be inefficeint, so we need to work on a better solution for implmenting these features.
 
 # Technical Decisions
@@ -113,6 +114,7 @@ Sequential runs should automatically start the engagment player in fullscreen.
 ## Libraries Used
 
 - vlcj 4.10.1 (vlc bindings)
+- apache commons 2.18.0 (file utils)
 - imgscalr 4.2 (currently not in use)
 - scala3-library (currently not in use)
 - Junit 5.11 (i need to write tests)
@@ -127,7 +129,7 @@ I'm currently trying to modularize as much as I can in the project to allow for 
 
 - The installation process is a little lengthy. I need to find an easy way to enable/disable services.
 - Sometimes the media player will crash, I speculate this has to do with the tasks and it was waiting too long while trying to download all the videos from the drive.
-- There was some cases of exceptions crashing the program due to not finding certain files or directories, I tried to clean it up as much as I could be automatically creating directories if needed but if paths aren't loaded in properly from `application.properties` the app could fail.
+- There was some cases of exceptions crashing the program due to not finding certain files or directories, I tried to clean it up as much as I could by automatically creating directories if needed and using try catch where ever possible, but if paths aren't loaded in properly from `application.properties` the app could fail.
 - Because the app installs using the $HOME enviornment variable there is not really compatability with non Unix systems so we need to change the start up in the Config class.
 
 # Conclusion 
