@@ -48,16 +48,10 @@ import org.apache.commons.io.FileUtils;
  */
 public class GDriveService
 {
-   
-  private Drive drive;
-  private String jinzoId; // id of folder we need. 
   private static final String googleAppName = "Jinzo";
   private static final String MAIN_FOLDER_NAME = "JINZO";
   private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
   private static final String FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
-
-  private File jinzoFolder;
-  private final boolean valid; 
 
   //we only use read only. app only needs to be able to download the videos.
   private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE_READONLY);
@@ -69,7 +63,9 @@ public class GDriveService
   private static final String TOKEN_STORAGE_PATH = Config.getProperty("tokenStoragePath");
   private static final String CREDENTIALS_FILE_PATH = Config.getProperty("googleCredentialsPath");
 
-
+  private Drive drive;
+  private File jinzoFolder;
+  private boolean valid;
 
   /**
    * Constructor for creating the google drive service.
@@ -84,6 +80,12 @@ public class GDriveService
    *  - currently using valid flag.
    */
   public GDriveService()
+  {
+    this.valid = false;
+    init();
+  }
+
+  private void init()
   {
     boolean valid = false;
     try
@@ -107,9 +109,14 @@ public class GDriveService
 
   /**
    * Returns true if you can safely use this service.
+   *
+   * will attempt to re initialize if it's not valid.
    */
-  public boolean isValid() { return this.valid; }
-  
+  public boolean isValid() { 
+    if(!this.valid)
+      init();
+    return this.valid;
+  }
 
   /**
    * Returns true if jinzo folder is found in drive.

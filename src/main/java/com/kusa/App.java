@@ -53,6 +53,8 @@ public class App
       @Override
       public void run()
       {
+        //calls to is valid will
+        //attempt to revalidate the drive service.
         if(gds.isValid())
           if(!gds.sync())
             return;
