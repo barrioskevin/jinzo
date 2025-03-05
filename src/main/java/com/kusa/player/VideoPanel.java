@@ -41,6 +41,9 @@ public class VideoPanel extends EmbeddedMediaPlayerComponent
       @Override
       public void finished(MediaPlayer mp)
       {
+        if(playlist.isEmpty())
+          System.out.println("WARNING THE VIDEO PLAYER CURRENTLY HAS AN EMPTY PLAYLIST");
+
         System.out.println("A VIDEO FINISHED.");
         final int idx = playlist.index();
         final String mrl = playlist.next();

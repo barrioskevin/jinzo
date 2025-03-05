@@ -53,9 +53,6 @@ public class App
       @Override
       public void run()
       {
-        //calls to is valid will
-        //attempt to revalidate the drive service.
-
         //playlist or video player won't be bothered between 12am - 8am
         int hour = LocalDateTime.now().getHour(); 
         if(hour >= 0 && hour < 8)
@@ -64,6 +61,8 @@ public class App
           return;
         }
 
+        //calls to is valid will
+        //attempt to revalidate the drive service.
         if(gds.isValid())
           if(!gds.sync())
             return;

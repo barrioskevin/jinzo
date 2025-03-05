@@ -66,6 +66,12 @@ public class CircularQueuePlaylist implements Playlist
   }
 
   @Override
+  public boolean isEmpty()
+  {
+    return mrls.isEmpty();
+  }
+
+  @Override
   public boolean remove(String mrl)
   {
     int index_ = mrls.indexOf(mrl); 
@@ -127,7 +133,7 @@ public class CircularQueuePlaylist implements Playlist
     if(mrls.isEmpty())
       return "";
 
-    if(index >= mrls.size())
+    if(index >= mrls.size() || index < 0)
       index = 0;
 
     final String next = mrls.get(index++);
