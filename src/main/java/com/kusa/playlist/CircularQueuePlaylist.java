@@ -89,6 +89,7 @@ public class CircularQueuePlaylist implements Playlist
       mrlSet.remove(mrl);
       if(pIndex <= this.index)
         this.index--;
+      System.out.println("REMOVED FILE FROM PLAYLIST BECAUSE NO LONGER EXISTS ON DISK. " + mrl);
     }
     catch(Exception e)
     {
@@ -129,7 +130,13 @@ public class CircularQueuePlaylist implements Playlist
     if(index >= mrls.size())
       index = 0;
 
-    return mrls.get(index++);
+    final String next = mrls.get(index++);
+    if(!LocalService.fileExists(next))
+    {
+      remove(next);
+      return next(); // TODO LOOOK OUT RIGHT HERE COULD BE TROUBLE!!!
+    }
+    return next;
   }
 
   /**
