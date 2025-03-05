@@ -55,6 +55,15 @@ public class App
       {
         //calls to is valid will
         //attempt to revalidate the drive service.
+
+        //playlist or video player won't be bothered between 12am - 8am
+        int hour = LocalDateTime.now().getHour(); 
+        if(hour >= 0 && hour < 8)
+        {
+          System.out.println("IT IS CURRENTLY THE " + hour + " HOUR SO WE WILL NOT MODIFY PLAYLIST OR USE SERVICES.");
+          return;
+        }
+
         if(gds.isValid())
           if(!gds.sync())
             return;
@@ -64,25 +73,39 @@ public class App
         {
           Playlist playlist = playlists.get(i);
           Set<String> mrls = new HashSet<>();
+          String name = "noname";
           if(i == 0)
+          {
             mrls.addAll(LocalService.getLocalMRLS("photos/left/", true));
+            name = "left panel playlist";
+          }
           if(i == 1)
+          {
             mrls.addAll(LocalService.getLocalMRLS("photos/right/", true));
+            name = "right panel playlist";
+          }
           if(i == 2)
+          {
             mrls.addAll(videoMRLS());
+            name = "VIDEOS";
+          }
 
           if(mrls.isEmpty())
             continue;
 
+
           //save index
-          final int idx = playlist.index();
-
+          //final int idx = playlist.index();
           //rebuild to account for new changes.
-          playlist.clear();
+          //System.out.println("CLEARING " + name + " PLAYLIST! With current IDX: " + idx);
+          //playlist.clear();
           for(String mrl : mrls)
-            playlist.add(mrl);
-
-          playlist.skipTo(idx % playlist.size());
+          {
+            if(!playlist.contains(mrl))
+              playlist.add(mrl);
+          }
+          //playlist.skipTo(idx % playlist.size());
+          System.out.println(name + " PLAYLIST REBUILT NEW INDEX: " + playlist.index());
         }
       }
     }, 10000, 60000);
