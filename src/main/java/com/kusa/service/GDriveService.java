@@ -218,14 +218,16 @@ public class GDriveService
   /**
    * Downloads a PathedFile locally.
    *
+   *
    * if file already exists we skip it.
    *
    * download file with their path as destination.
    *
    * @param pf PathedFile we want to download. (pathed files are gdrive files)
+   * @return true if file was downloaded.
    *
    */
-  public void downloadPathedFile(PathedFile pf)
+  public boolean downloadPathedFile(PathedFile pf)
   {
     final String id = pf.file().getId();
     final String path = Config.getProperty("downloadPath") + pf.path();
@@ -235,19 +237,21 @@ public class GDriveService
       if(new java.io.File(path + name).exists())
       {
         System.out.println("Skipping this download..." + name);
-        return;
+        return false;
       }
       ByteArrayOutputStream os = new ByteArrayOutputStream();
       drive.files().get(id).executeMediaAndDownloadTo(os);
       FileOutputStream fos = new FileOutputStream(path + name);
       os.writeTo(fos);
+      System.out.printf("SUCCESSFULLY DOWNLOADED NEW FILE\n file:%s\n driveID:%s\n", name, id);
+      return true;
     }
     catch(Exception e)
     {
       System.out.printf("download failed!\n name:%s\n id:%s", name, id);
       System.out.println(e.getMessage());
       e.printStackTrace();
-      return;
+      return false;
     }
   }
 
@@ -258,16 +262,16 @@ public class GDriveService
       Set<String> localMrls = LocalService.getLocalMRLS();
       Set<String> driveMrls = new HashSet<>();
       List<PathedFile> files = getFileList();
-      System.out.println("downloading files... ");
+      System.out.println("gds: starting downloads... ");
       for(PathedFile pf : files)
       {
         LocalService.checkDir(Config.getProperty("downloadPath") + pf.path());
         String mt = pf.file().getMimeType();
         if(mt.contains("video") || mt.contains("image"))
         {
-          downloadPathedFile(pf); //DOWNLOAD DRIVE FILE.
+          if(downloadPathedFile(pf)) //DOWNLOAD DRIVE FILE.
+            changed = true;
           driveMrls.add(Config.getProperty("downloadPath") + pf.path() + pf.file().getName());
-          changed = true;
         }
       }
       for(String mrl : localMrls)
@@ -277,6 +281,7 @@ public class GDriveService
           java.io.File file = new java.io.File(mrl);
           FileUtils.delete(file); //DELETES LOCAL FILES
           changed = true;
+          System.out.println("DELETED LOCAL FILE BECUASE IT'S NO LONGER IN DRIVE " + file.getAbsolutePath());
         }
       }
       return changed;
