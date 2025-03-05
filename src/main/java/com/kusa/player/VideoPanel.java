@@ -41,11 +41,13 @@ public class VideoPanel extends EmbeddedMediaPlayerComponent
       @Override
       public void finished(MediaPlayer mp)
       {
+        System.out.println("A VIDEO FINISHED.");
         final int idx = playlist.index();
         final String mrl = playlist.next();
 
         mediaPlayer().submit(() -> mediaPlayer().media().play(mrl, "--avcodec-hw=mmal", "--no-xlib", "--no-osd", "--no-interact", "--no-video-filter", "--quiet"));
         System.out.printf("NOW PLAYING %d : %s \n", idx, mrl);
+        System.out.printf("NEXT INDEX %d\n", playlist.index());
       }
     });
   }
@@ -66,5 +68,4 @@ public class VideoPanel extends EmbeddedMediaPlayerComponent
     mediaPlayer().media().play(mrl);
     System.out.printf("NOW STARTING %d : %s \n", idx, mrl);
   }
-
 }
