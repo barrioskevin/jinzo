@@ -188,12 +188,41 @@ public class GDriveService
    *
    * @return List of google drive files in application folder (JINZO).
    */
-  public List<PathedFile> getFileList()
+  public List<PathedFile> getFileList() { return getFileList("", true); }
+  public List<PathedFile> getFileList(String nestedFolders, boolean recursive)
   {
     try
     {
+      PathedFile start = new PathedFile(jinzoFolder, "");
+
+      Queue<PathedFile> folders_ = new LinkedList<>(List.of(new PathedFile(jinzoFolder, "")));
+      boolean skipSearch = true;
+      if(!nestedFolders.equals(""))
+      {
+        System.out.println("GETTING FILES FROM GOOGLE DRIVE SEARCHING FOR START DIR: " + nestedFolders);
+        skipSearch = false;
+      }
+      while(!folders_.isEmpty() && !nestedFolders.equals("") && !skipSearch)
+      {
+        PathedFile pf = folders_.poll();
+        File folder = pf.file();
+        String path = pf.path();
+        String id = folder.getId();
+        String query = String.format("'%s' in parents and trashed = false",id);
+        FileList result = drive.files().list().setQ(query).setFields("files(id, name, parents, description, mimeType)").execute();
+        List<File> folderFiles = result.getFiles();
+        for(File file : folderFiles)
+        {
+          if(file.getMimeType().equals(FOLDER_MIME_TYPE)
+              && nestedFolders.equals(path + file.getName() + "/"))
+          {
+            start = new PathedFile(file, path + file.getName() + "/");
+            skipSearch = true;
+          }
+        }
+      }
       //Google drive File
-      Queue<PathedFile> folders = new LinkedList<>(List.of(new PathedFile(jinzoFolder, "")));
+      Queue<PathedFile> folders = new LinkedList<>(List.of(start));
       List<PathedFile> files = new ArrayList<>();
       while(!folders.isEmpty())
       {
@@ -207,9 +236,10 @@ public class GDriveService
         List<File> folderFiles = result.getFiles();
         for(File file : folderFiles)
         {
-          if(file.getMimeType().equals(FOLDER_MIME_TYPE))
+          if(file.getMimeType().equals(FOLDER_MIME_TYPE) && recursive)
             folders.add(new PathedFile(file, path + file.getName() + "/"));
-          else
+
+          if(!file.getMimeType().equals(FOLDER_MIME_TYPE))
             files.add(new PathedFile(file, path));
         }
       }
@@ -249,7 +279,7 @@ public class GDriveService
       drive.files().get(id).executeMediaAndDownloadTo(os);
       FileOutputStream fos = new FileOutputStream(path + name);
       os.writeTo(fos);
-      System.out.printf("SUCCESSFULLY DOWNLOADED NEW FILE\n file:%s\n driveID:%s\n", name, id);
+      System.out.printf("SUCCESSFULLY DOWNLOADED NEW FILE\n file:%s\n driveID:%s\n path:%s\n", name, id, path);
       return true;
     }
     catch(Exception e)
@@ -265,8 +295,6 @@ public class GDriveService
   {
     try{
       boolean changed = false;
-      Set<String> localMrls = LocalService.getLocalMRLS();
-      Set<String> driveMrls = new HashSet<>();
       List<PathedFile> files = getFileList();
       if(files.isEmpty())
       {
@@ -279,11 +307,8 @@ public class GDriveService
         LocalService.checkDir(Config.getProperty("downloadPath") + pf.path());
         String mt = pf.file().getMimeType();
         if(mt.contains("video") || mt.contains("image"))
-        {
           if(downloadPathedFile(pf)) //DOWNLOAD DRIVE FILE.
             changed = true;
-          driveMrls.add(Config.getProperty("downloadPath") + pf.path() + pf.file().getName());
-        }
       }
       return changed;
     } catch(Exception e)
