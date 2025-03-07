@@ -74,14 +74,6 @@ public class Config {
       if (!driveFolder.exists())
         if (!driveFolder.mkdirs()) System.out.println("FAILED TO FIND OR CREATE DRIVE FOLDER.");
 
-      File videoFolder = new File(getProperty("downloadPath") + "videos/");
-      if (!videoFolder.exists())
-        if (!videoFolder.mkdirs()) System.out.println("FAILED TO FIND OR CREATE VIDEO FOLDER.");
-
-      File photoFolder = new File(getProperty("downloadPath") + "photos/");
-      if (!photoFolder.exists())
-        if (!photoFolder.mkdirs()) System.out.println("FAILED TO FIND OR CREATE PHOTOS FOLDER.");
-
       File tokenFolder = new File(getProperty("tokenStoragePath"));
       if (!tokenFolder.exists())
         if (!tokenFolder.mkdirs()) System.out.println("FAILED TO FIND OR CREATE TOKEN FOLDER.");
