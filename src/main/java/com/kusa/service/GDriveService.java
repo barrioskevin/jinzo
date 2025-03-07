@@ -114,7 +114,14 @@ public class GDriveService
    */
   public boolean isValid() { 
     if(!this.valid)
+    {
+      System.out.println("GDS SERVICE IS INVLALID ATTEMPTING TO VALIDATE");
       init();
+    }
+
+    if(this.valid)
+      System.out.println("GDS SERVICE IS VALID!");
+
     return this.valid;
   }
 
@@ -211,6 +218,8 @@ public class GDriveService
     catch(Exception e)
     {
       System.out.println("GDriveService: Failed to get files." + e); 
+      System.out.println("GDriveService: Setting valid to FALSE"); 
+      this.valid = false;
       return Collections.emptyList();
     }
   }
@@ -235,10 +244,7 @@ public class GDriveService
     try
     {
       if(new java.io.File(path + name).exists())
-      {
-        System.out.println("Skipping this download..." + name);
         return false;
-      }
       ByteArrayOutputStream os = new ByteArrayOutputStream();
       drive.files().get(id).executeMediaAndDownloadTo(os);
       FileOutputStream fos = new FileOutputStream(path + name);
@@ -255,13 +261,18 @@ public class GDriveService
     }
   }
 
-  public boolean sync()
+  public boolean downloadMedia()
   {
     try{
       boolean changed = false;
       Set<String> localMrls = LocalService.getLocalMRLS();
       Set<String> driveMrls = new HashSet<>();
       List<PathedFile> files = getFileList();
+      if(files.isEmpty())
+      {
+        System.out.println("GDriveService: GOT NO FILES FROM CALLING GET FILES WILL SKIP DOWNLOADS");
+        return false;
+      }
       System.out.println("gds: starting downloads... ");
       for(PathedFile pf : files)
       {
@@ -272,16 +283,6 @@ public class GDriveService
           if(downloadPathedFile(pf)) //DOWNLOAD DRIVE FILE.
             changed = true;
           driveMrls.add(Config.getProperty("downloadPath") + pf.path() + pf.file().getName());
-        }
-      }
-      for(String mrl : localMrls)
-      {
-        if(!driveMrls.contains(mrl))
-        {
-          java.io.File file = new java.io.File(mrl);
-          FileUtils.delete(file); //DELETES LOCAL FILES
-          changed = true;
-          System.out.println("DELETED LOCAL FILE BECUASE IT'S NO LONGER IN DRIVE " + file.getAbsolutePath());
         }
       }
       return changed;

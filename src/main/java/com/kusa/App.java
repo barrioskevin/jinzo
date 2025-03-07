@@ -32,10 +32,10 @@ public class App
 {
   public static void main(String args[])
   {
-    //initial sync.
+    //initial downloads.
     GDriveService gds = new GDriveService();
     if(gds.isValid())
-      gds.sync();
+      gds.downloadMedia();
 
     //initial playlists.
     CircularQueuePlaylist leftPanelPlaylist = new CircularQueuePlaylist(new ArrayList<String>(LocalService.getLocalMRLS("photos/left/", true)));
@@ -47,7 +47,7 @@ public class App
     SidePanel right = new SidePanel(rightPanelPlaylist.current());
     VideoPanel middle = new VideoPanel(videoPlaylist);
 
-    //schedule poll and sync task.
+    //schedule poll and download task.
     Timer timer = new Timer();
     timer.schedule(new TimerTask() {
       @Override
@@ -64,7 +64,7 @@ public class App
         //calls to is valid will
         //attempt to revalidate the drive service.
         if(gds.isValid())
-          if(!gds.sync())
+          if(!gds.downloadMedia())
             return;
 
         List<Playlist> playlists = List.of(leftPanelPlaylist, rightPanelPlaylist, videoPlaylist);
