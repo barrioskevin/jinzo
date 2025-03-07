@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Collections;
 
 /**
  * Class respresenting a circular queue playlist.
@@ -95,7 +96,7 @@ public class CircularQueuePlaylist implements Playlist
       mrlSet.remove(mrl);
       if(pIndex <= this.index)
         this.index--;
-      System.out.println("REMOVED FILE FROM PLAYLIST BECAUSE NO LONGER EXISTS ON DISK. " + mrl);
+      System.out.println("REMOVED FILE FROM PLAYLIST. " + mrl);
     }
     catch(Exception e)
     {
@@ -131,7 +132,10 @@ public class CircularQueuePlaylist implements Playlist
   public String next()
   {
     if(mrls.isEmpty())
+    {
+      System.out.println("CALLING NEXT ON EMPTY PLAYLIST.");
       return "";
+    }
 
     if(index >= mrls.size() || index < 0)
       index = 0;
@@ -192,6 +196,12 @@ public class CircularQueuePlaylist implements Playlist
   @Override
   public int index() { 
     return ((this.index >= mrls.size()) ? 0 : this.index); 
+  }
+
+  @Override
+  public void shuffle()
+  {
+    Collections.shuffle(mrls);
   }
 
 

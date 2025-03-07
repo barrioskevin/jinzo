@@ -15,6 +15,8 @@ public interface Playlist {
   boolean clear();
   boolean isEmpty();
 
+  void shuffle();
+
   //true if mrl is in playlist.
   boolean contains(String mrl);
 
