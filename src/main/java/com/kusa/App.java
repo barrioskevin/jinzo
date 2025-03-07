@@ -40,12 +40,12 @@ public class App
     //initial playlists.
     CircularQueuePlaylist leftPanelPlaylist = new CircularQueuePlaylist(new ArrayList<String>(LocalService.getLocalMRLS("photos/left/", true)));
     CircularQueuePlaylist rightPanelPlaylist = new CircularQueuePlaylist(new ArrayList<String>(LocalService.getLocalMRLS("photos/right/", true)));
-    CircularQueuePlaylist videoPlaylist = new CircularQueuePlaylist(new ArrayList<String>(videoMRLS()));
+    CircularQueuePlaylist videoPlaylist = new CircularQueuePlaylist(new ArrayList<String>(VideoPanel.videoMRLS()));
 
     //panels.
     SidePanel left = new SidePanel(leftPanelPlaylist.current());
     SidePanel right = new SidePanel(rightPanelPlaylist.current());
-    VideoPanel middle = new VideoPanel(videoPlaylist);
+    VideoPanel middle = new VideoPanel(videoPlaylist, gds);
 
     //schedule poll and download task.
     Timer timer = new Timer();
@@ -64,98 +64,41 @@ public class App
         //calls to is valid will
         //attempt to revalidate the drive service.
         if(gds.isValid())
-          if(!gds.downloadMedia())
-            return;
-
-        List<Playlist> playlists = List.of(leftPanelPlaylist, rightPanelPlaylist, videoPlaylist);
-        for(int i = 0; i < playlists.size(); i++)
-        {
-          Playlist playlist = playlists.get(i);
-          Set<String> mrls = new HashSet<>();
-          String name = "noname";
-          if(i == 0)
-          {
-            mrls.addAll(LocalService.getLocalMRLS("photos/left/", true));
-            name = "left panel playlist";
-          }
-          if(i == 1)
-          {
-            mrls.addAll(LocalService.getLocalMRLS("photos/right/", true));
-            name = "right panel playlist";
-          }
-          if(i == 2)
-          {
-            mrls.addAll(videoMRLS());
-            name = "VIDEOS";
-          }
-
-          if(mrls.isEmpty())
-            continue;
-
-
-          //save index
-          //final int idx = playlist.index();
-          //rebuild to account for new changes.
-          //System.out.println("CLEARING " + name + " PLAYLIST! With current IDX: " + idx);
-          //playlist.clear();
-          for(String mrl : mrls)
-          {
-            if(!playlist.contains(mrl))
-              playlist.add(mrl);
-          }
-          //playlist.skipTo(idx % playlist.size());
-          System.out.println(name + " PLAYLIST REBUILT NEW INDEX: " + playlist.index());
-        }
+          gds.downloadMedia();
       }
-    }, 10000, 60000);
+    }, 10000, 60000); //every 1 min
 
     Timer timer2 = new Timer();
     timer2.schedule(new TimerTask() {
       @Override
       public void run()
       {
+        Set<String> currLeft = new HashSet<>(leftPanelPlaylist.trackList());
+        Set<String> currRight = new HashSet<>(rightPanelPlaylist.trackList());
+        for(String pic : LocalService.getLocalMRLS("photos/left/", true))
+        {
+          if(!currLeft.contains(pic))
+          {
+            System.out.println("ADDING NEW PICTURE " + pic + " TO LEFT PANEL PLAYLIST.");
+            leftPanelPlaylist.add(pic);
+          }
+        }
+        for(String pic : LocalService.getLocalMRLS("photos/right/", true))
+        {
+          if(!currRight.contains(pic))
+          {
+            System.out.println("ADDING NEW PICTURE " + pic + " TO RIGHT PANEL PLAYLIST.");
+            rightPanelPlaylist.add(pic);
+          }
+        }
         left.setImage(leftPanelPlaylist.next());
         right.setImage(rightPanelPlaylist.next());
       }
-    }, 60000, 60000);
+    }, 60000, 300000); //every 5 min
 
     //create and play engagement frame.
     AppFrame engagementFrame = new AppFrame(left, right, middle);
     engagementFrame.fullscreen();
     middle.play();
-  }
-
-  //returns mrls for all files in the videos directory
-  //and files in the corresponding day of week folder.
-  public static Set<String> videoMRLS()
-  {
-    Set<String> mrls = LocalService.getLocalMRLS("videos/", false);
-    switch(LocalDateTime.now().getDayOfWeek())
-    {
-      case MONDAY:
-        mrls.addAll(LocalService.getLocalMRLS("videos/monday/", true));
-        break;
-      case TUESDAY:
-        mrls.addAll(LocalService.getLocalMRLS("videos/tuesday/", true));
-        break;
-      case WEDNESDAY:
-        mrls.addAll(LocalService.getLocalMRLS("videos/wednesday/", true));
-        break;
-      case THURSDAY:
-        mrls.addAll(LocalService.getLocalMRLS("videos/thursday/", true));
-        break;
-      case FRIDAY:
-        mrls.addAll(LocalService.getLocalMRLS("videos/friday/", true));
-        break;
-      case SATURDAY:
-        mrls.addAll(LocalService.getLocalMRLS("videos/saturday/", true));
-        break;
-      case SUNDAY:
-        mrls.addAll(LocalService.getLocalMRLS("videos/sunday/", true));
-        break;
-      default:
-        break;
-    }
-    return mrls;
   }
 }
