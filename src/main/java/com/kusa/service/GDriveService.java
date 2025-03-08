@@ -49,7 +49,7 @@ import org.apache.commons.io.FileUtils;
 public class GDriveService
 {
   private static final String googleAppName = "Jinzo";
-  private static final String MAIN_FOLDER_NAME = "JINZO";
+  private static final String MAIN_FOLDER_NAME = "JINZO-DEV";
   private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
   private static final String FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
 
@@ -195,32 +195,47 @@ public class GDriveService
     {
       PathedFile start = new PathedFile(jinzoFolder, "");
 
-      Queue<PathedFile> folders_ = new LinkedList<>(List.of(new PathedFile(jinzoFolder, "")));
       boolean skipSearch = true;
       if(!nestedFolders.equals(""))
       {
         System.out.println("GETTING FILES FROM GOOGLE DRIVE SEARCHING FOR START DIR: " + nestedFolders);
         skipSearch = false;
       }
-      while(!folders_.isEmpty() && !nestedFolders.equals("") && !skipSearch)
+
+      if(!nestedFolders.equals(""))
       {
-        PathedFile pf = folders_.poll();
+        String pageToken = null;
+        PathedFile pf = new PathedFile(jinzoFolder, "");
         File folder = pf.file();
         String path = pf.path();
         String id = folder.getId();
-        String query = String.format("'%s' in parents and trashed = false",id);
-        FileList result = drive.files().list().setQ(query).setFields("files(id, name, parents, description, mimeType)").execute();
-        List<File> folderFiles = result.getFiles();
-        for(File file : folderFiles)
-        {
-          if(file.getMimeType().equals(FOLDER_MIME_TYPE)
-              && nestedFolders.equals(path + file.getName() + "/"))
+        do {
+          String query = String.format("'%s' in parents and trashed = false",id);
+          FileList result = drive.files().list().setQ(query).setFields("nextPageToken, files(id, name, parents, description, mimeType)")
+            .setPageToken(pageToken).execute();
+          if(result.getNextPageToken() != null)
           {
-            start = new PathedFile(file, path + file.getName() + "/");
-            skipSearch = true;
+            System.out.println("NEXT PAGE TOKEN: " + result.getNextPageToken());
           }
-        }
+          if(result.getIncompleteSearch() != null)
+            if(result.getIncompleteSearch())
+              System.out.println("GDS: INCOMPLETE SEARCH OCCURED IN GET FILE LIST");
+          pageToken = result.getNextPageToken();
+          List<File> folderFiles = result.getFiles();
+          System.out.println("GDS: FOUND " + folderFiles.size() + " FILES IN :/" + path);
+          for(File file : folderFiles)
+          {
+            if(file.getMimeType().equals(FOLDER_MIME_TYPE)
+                && nestedFolders.equals(path + file.getName() + "/"))
+            {
+              start = new PathedFile(file, path + file.getName() + "/");
+              skipSearch = true;
+              break;
+            }
+          }
+        } while(pageToken != null && !skipSearch);
       }
+      
       //Google drive File
       Queue<PathedFile> folders = new LinkedList<>(List.of(start));
       List<PathedFile> files = new ArrayList<>();
@@ -232,16 +247,28 @@ public class GDriveService
         String id = folder.getId();
 
         String query = String.format("'%s' in parents and trashed = false",id);
-        FileList result = drive.files().list().setQ(query).setFields("files(id, name, parents, description, mimeType)").execute();
-        List<File> folderFiles = result.getFiles();
-        for(File file : folderFiles)
-        {
-          if(file.getMimeType().equals(FOLDER_MIME_TYPE) && recursive)
-            folders.add(new PathedFile(file, path + file.getName() + "/"));
+        String pageToken = null;
+        do{
+          FileList result = drive.files().list().setQ(query).setFields("nextPageToken, files(id, name, parents, description, mimeType)")
+            .setPageToken(pageToken).execute();
+          if(result.getNextPageToken() != null)
+          {
+            System.out.println("NEXT PAGE TOKEN: " + result.getNextPageToken());
+          }
+          if(result.getIncompleteSearch() != null)
+            if(result.getIncompleteSearch())
+              System.out.println("GDS: INCOMPLETE SEARCH OCCURED IN GET FILE LIST");
+          pageToken = result.getNextPageToken();
+          List<File> folderFiles = result.getFiles();
+          for(File file : folderFiles)
+          {
+            if(file.getMimeType().equals(FOLDER_MIME_TYPE) && recursive)
+              folders.add(new PathedFile(file, path + file.getName() + "/"));
 
-          if(!file.getMimeType().equals(FOLDER_MIME_TYPE))
-            files.add(new PathedFile(file, path));
-        }
+            if(!file.getMimeType().equals(FOLDER_MIME_TYPE))
+              files.add(new PathedFile(file, path));
+          }
+        } while(pageToken != null);
       }
       return files;
     }

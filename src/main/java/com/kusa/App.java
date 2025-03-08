@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.kusa.util.PathedFile;
 import java.time.LocalDateTime;
 import java.time.DayOfWeek;
 
@@ -34,6 +35,7 @@ public class App
   {
     //initial downloads.
     GDriveService gds = new GDriveService();
+
     if(gds.isValid())
       gds.downloadMedia();
 
@@ -100,5 +102,6 @@ public class App
     AppFrame engagementFrame = new AppFrame(left, right, middle);
     engagementFrame.fullscreen();
     middle.play();
+
   }
 }
