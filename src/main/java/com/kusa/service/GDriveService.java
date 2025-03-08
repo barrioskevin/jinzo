@@ -49,7 +49,7 @@ import org.apache.commons.io.FileUtils;
 public class GDriveService
 {
   private static final String googleAppName = "Jinzo";
-  private static final String MAIN_FOLDER_NAME = "JINZO-DEV";
+  private static final String MAIN_FOLDER_NAME = "JINZO";
   private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
   private static final String FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
 
