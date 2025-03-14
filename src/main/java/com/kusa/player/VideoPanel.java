@@ -35,9 +35,8 @@ public class VideoPanel extends EmbeddedMediaPlayerComponent
   /**
    * Constructs a video panel for use in an engagment frame.
    *
-   * we should proably add the playlist as a parameter to this 
-   * class eventually so we don't have to manage the playlist 
-   * within a video panel.
+   * @param playlist_ the playlist dictating the media panel will play.
+   * @param gds_ the apps google drive service.
    */
   public VideoPanel(Playlist playlist_, GDriveService gds_)
   {
@@ -45,7 +44,7 @@ public class VideoPanel extends EmbeddedMediaPlayerComponent
     playlist = playlist_;
     gds = gds_;
 
-    setOpaque(true);
+    setOpaque(true); //maybe remove?
 
     //we setup a event adapter to automatically play the next video in a playlist
     //once a video ends.
@@ -101,6 +100,7 @@ public class VideoPanel extends EmbeddedMediaPlayerComponent
 
   /**
    * Advances the playlist and plays the next media.
+   * expects the media player to be <strong>Stopped.</strong>
    *
    * called by the main app to start the video panel. 
    *
@@ -116,8 +116,15 @@ public class VideoPanel extends EmbeddedMediaPlayerComponent
     System.out.printf("NOW STARTING %d : %s \n", idx, mrl);
   }
 
-  //returns mrls for all files in the videos directory
-  //and files in the corresponding day of week folder.
+
+  
+  /** Returns mrls for all files in the videos directory
+   *  and files in the corresponding day of week folder.
+   *
+   *  this function is kinda specific. it's basically the videos 
+   *  you want to consider for the playlist. the playlist will call
+   *  this method and add any mrls it doesn't have.
+   */
   public static Set<String> videoMRLS()
   {
     Set<String> mrls = LocalService.getLocalMRLS("videos/", false);
