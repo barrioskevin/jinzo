@@ -97,6 +97,7 @@ Sequential runs should automatically start the engagment player in fullscreen.
 - Manages **Media Resource Links** to be passed to the video panel. 
 - There is potential for all kinds of different Playlist types.
 - Currently we have a circular queue playlist that will repeatedly play all the vidoes in the queue and circle back once it reaches the end.
+- I am working on a good way to get the side panels to utilize playlists so we can show different images either by time or by checking the day.
 
 ## Services
 
