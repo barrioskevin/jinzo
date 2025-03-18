@@ -274,7 +274,8 @@ public class GDriveService
     }
     catch(Exception e)
     {
-      System.out.println("GDriveService: Failed to get files." + e); 
+      System.out.println("GDriveService: Failed to get files. " + e + e.getMessage()); 
+      e.printStackTrace();
       System.out.println("GDriveService: Setting valid to FALSE"); 
       this.valid = false;
       return Collections.emptyList();

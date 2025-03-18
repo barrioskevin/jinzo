@@ -17,6 +17,11 @@ import javax.swing.ImageIcon;
 import javax.swing.BorderFactory;
 import java.awt.GridLayout;
 
+import java.time.LocalDateTime;
+import java.time.DayOfWeek;
+import java.util.Set;
+import com.kusa.service.LocalService;
+
 /**
  * Class for managing a side panel of an engagment frame.
  *
@@ -98,4 +103,55 @@ public class SidePanel extends JPanel
       System.out.println("FAILED TO SET A NEW IMAGE");
     }
   }
+
+  /**
+   * Returns the mrls for side panels of the day.
+   *
+   * will default to just left or right if no daily images.
+   * @param leftPanel - true if you want get mrls of left panel.
+   */
+  public static Set<String> photoMRLS(boolean leftPanel)
+  {
+    String dir = leftPanel ? "photos/left/" : "photos/right/";
+    switch(LocalDateTime.now().getDayOfWeek())
+    {
+      case MONDAY:
+        Set<String> mondayMRLS = LocalService.getLocalMRLS(dir+"monday/", true);
+        if(!mondayMRLS.isEmpty())
+          return mondayMRLS;
+        break;
+      case TUESDAY:
+        Set<String> tuesdayMRLS = LocalService.getLocalMRLS(dir+"tuesday/", true);
+        if(!tuesdayMRLS.isEmpty())
+          return tuesdayMRLS;
+        break;
+      case WEDNESDAY:
+        Set<String> wednesdayMRLS = LocalService.getLocalMRLS(dir+"wednesday/", true);
+        if(!wednesdayMRLS.isEmpty())
+          return wednesdayMRLS;
+        break;
+      case THURSDAY:
+        Set<String> thursdayMRLS = LocalService.getLocalMRLS(dir+"thursday/", true);
+        if(!thursdayMRLS.isEmpty())
+          return thursdayMRLS;
+        break;
+      case FRIDAY:
+        Set<String> fridayMRLS = LocalService.getLocalMRLS(dir+"friday/", true);
+        if(!fridayMRLS.isEmpty())
+          return fridayMRLS;
+        break;
+      case SATURDAY:
+        Set<String> saturdayMRLS = LocalService.getLocalMRLS(dir+"saturday/", true);
+        if(!saturdayMRLS.isEmpty())
+          return saturdayMRLS;
+        break;
+      case SUNDAY:
+        Set<String> sundayMRLS = LocalService.getLocalMRLS(dir+"sunday/", true);
+        if(!sundayMRLS.isEmpty())
+          return sundayMRLS;
+        break;
+    }
+    //default, MIGHT be empty.
+    return LocalService.getLocalMRLS(dir, false);
+  } 
 }

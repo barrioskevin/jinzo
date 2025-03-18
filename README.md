@@ -94,7 +94,7 @@ Sequential runs should automatically start the engagment player in fullscreen.
 ## Playlist
 
 - Playlist object is responsible for controlling which media to pull from the downloaded videos path. 
-- Manages **Media Resource Links** to be passed to the video panel. 
+- Manages **Media Resource Locators** to be passed to the video panel. 
 - There is potential for all kinds of different Playlist types.
 - Currently we have a circular queue playlist that will repeatedly play all the vidoes in the queue and circle back once it reaches the end.
 - I am working on a good way to get the side panels to utilize playlists so we can show different images either by time or by checking the day.
@@ -107,8 +107,11 @@ Sequential runs should automatically start the engagment player in fullscreen.
 ## Syncs 
 
 - This app currently relies on Java's Timer and TimerTasks to continously call services and update playlists. 
-- In the main method we setup a task to keep our local app's directory in sync with the google drive app folder this task also updates the playlists if any changes were found to keep them in sync with google drive.
-- This *might* be inefficeint, so we need to work on a better solution for implmenting these features.
+- We attempt to sync the program with drive in by repeadately making calls to download anything new in the drive.
+- In the main method we setup a task to call `downloadMedia()` every minute which downloads any new files from the drive.
+- We then build our playlist based off what we have downloaded.
+- Before I would delete any local files that weren't in the drive but we no longer do that.
+- Trying to come up with a better sync system so that we can even add remote control of the player.
 
 # Technical Decisions
 
@@ -128,8 +131,7 @@ I'm currently trying to modularize as much as I can in the project to allow for 
 
 # Known Issues
 
-- The installation process is a little lengthy. I need to find an easy way to enable/disable services.
-- Sometimes the media player will crash, I speculate this has to do with the tasks and it was waiting too long while trying to download all the videos from the drive.
+- I will sometimes get a `java.net.SocketTimeException` or a `java.net.UnknownHostException`, from what I understand this is just my app timing out when trying to reach google drive. I'm not sure if there is anything I can do programatically but I have to make sure that my app is prepared for a failure like this. Before I would get video playback errors because I was deleting videos with the assumption that I would be able to download them again right way, but if I ever time out then the player will have nothing to play.
 - There was some cases of exceptions crashing the program due to not finding certain files or directories, I tried to clean it up as much as I could by automatically creating directories if needed and using try catch where ever possible, but if paths aren't loaded in properly from `application.properties` the app could fail.
 - Because the app installs using the $HOME enviornment variable there is not really compatability with non Unix systems so we need to change the start up in the Config class.
 
