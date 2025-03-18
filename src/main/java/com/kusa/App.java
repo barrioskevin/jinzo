@@ -1,6 +1,7 @@
 package com.kusa;
 import com.kusa.player.AppFrame;
 import com.kusa.player.SidePanel;
+//import com.kusa.player.CustomSidePanel;
 import com.kusa.player.VideoPanel;
 
 import com.kusa.playlist.Playlist;
@@ -40,8 +41,8 @@ public class App
       gds.downloadMedia();
 
     //initial playlists.
-    CircularQueuePlaylist leftPanelPlaylist = new CircularQueuePlaylist(new ArrayList<String>(LocalService.getLocalMRLS("photos/left/", true)));
-    CircularQueuePlaylist rightPanelPlaylist = new CircularQueuePlaylist(new ArrayList<String>(LocalService.getLocalMRLS("photos/right/", true)));
+    CircularQueuePlaylist leftPanelPlaylist = new CircularQueuePlaylist(new ArrayList<String>(SidePanel.photoMRLS(true)));
+    CircularQueuePlaylist rightPanelPlaylist = new CircularQueuePlaylist(new ArrayList<String>(SidePanel.photoMRLS(false)));
     CircularQueuePlaylist videoPlaylist = new CircularQueuePlaylist(new ArrayList<String>(VideoPanel.videoMRLS()));
 
     //panels.
@@ -75,22 +76,24 @@ public class App
       @Override
       public void run()
       {
-        Set<String> currLeft = new HashSet<>(leftPanelPlaylist.trackList());
-        Set<String> currRight = new HashSet<>(rightPanelPlaylist.trackList());
-        for(String pic : LocalService.getLocalMRLS("photos/left/", true))
+        Set<String> newLeft = SidePanel.photoMRLS(true);
+        Set<String> newRight = SidePanel.photoMRLS(false);
+        if(!newLeft.isEmpty())
         {
-          if(!currLeft.contains(pic))
+          leftPanelPlaylist.clear();
+          for(String mrl : newLeft)
           {
-            System.out.println("ADDING NEW PICTURE " + pic + " TO LEFT PANEL PLAYLIST.");
-            leftPanelPlaylist.add(pic);
+            System.out.println("ADDING PICTURE " + mrl + " TO LEFT PANEL PLAYLIST.");
+            leftPanelPlaylist.add(mrl);
           }
         }
-        for(String pic : LocalService.getLocalMRLS("photos/right/", true))
+        if(!newRight.isEmpty())
         {
-          if(!currRight.contains(pic))
+          rightPanelPlaylist.clear();
+          for(String mrl : newRight)
           {
-            System.out.println("ADDING NEW PICTURE " + pic + " TO RIGHT PANEL PLAYLIST.");
-            rightPanelPlaylist.add(pic);
+            System.out.println("ADDING PICTURE " + mrl + " TO LEFT PANEL PLAYLIST.");
+            rightPanelPlaylist.add(mrl);
           }
         }
         left.setImage(leftPanelPlaylist.next());
@@ -99,6 +102,7 @@ public class App
     }, 60000, 300000); //every 5 min
 
     //create and play engagement frame.
+    //CustomSidePanel csp = new CustomSidePanel();
     AppFrame engagementFrame = new AppFrame(left, right, middle);
     engagementFrame.fullscreen();
     middle.play();

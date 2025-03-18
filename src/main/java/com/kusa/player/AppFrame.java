@@ -38,6 +38,7 @@ public class AppFrame extends JFrame
   private VideoPanel middlePanel;
   private SidePanel rightPanel;
   private JPanel contentPane;
+  //private CustomSidePanel rightPanel_;
 
   /**
    * Constructs the engagment frame from two side panels and a video panel.
