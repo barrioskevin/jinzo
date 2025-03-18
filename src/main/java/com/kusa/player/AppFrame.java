@@ -32,7 +32,7 @@ public class AppFrame extends JFrame
    * might not work for all enviornments. but we define the screen 
    * so that we can make our app go into full screen mode after launching.
    */
-  static GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
+  public static GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
 
   private SidePanel leftPanel;
   private VideoPanel middlePanel;
@@ -72,12 +72,16 @@ public class AppFrame extends JFrame
 
     contentPane.setLayout(new BorderLayout());
 
+    
+
     contentPane.add(leftPanel, BorderLayout.WEST);
     contentPane.add(middlePanel, BorderLayout.CENTER);
     contentPane.add(rightPanel, BorderLayout.EAST);
 
     setContentPane(contentPane);
     setVisible(true);
+
+    
   }
 
   /** Toggles full screen on systems main device.
