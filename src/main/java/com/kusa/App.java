@@ -45,9 +45,15 @@ public class App
     CircularQueuePlaylist rightPanelPlaylist = new CircularQueuePlaylist(new ArrayList<String>(SidePanel.photoMRLS(false)));
     CircularQueuePlaylist videoPlaylist = new CircularQueuePlaylist(new ArrayList<String>(VideoPanel.videoMRLS()));
 
+    System.out.println(AppFrame.device.getDisplayMode().getWidth());
+    System.out.println(AppFrame.device.getDisplayMode().getHeight());
+    
+    final int screenWidth = AppFrame.device.getDisplayMode().getWidth();
+    final int screenHeight = AppFrame.device.getDisplayMode().getWidth();
+
     //panels.
-    SidePanel left = new SidePanel(leftPanelPlaylist.current());
-    SidePanel right = new SidePanel(rightPanelPlaylist.current());
+    SidePanel left = new SidePanel(leftPanelPlaylist.current(), screenWidth/3, screenHeight);
+    SidePanel right = new SidePanel(rightPanelPlaylist.current(), screenWidth/3, screenHeight);
     VideoPanel middle = new VideoPanel(videoPlaylist, gds);
 
     //schedule poll and download task.
