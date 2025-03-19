@@ -44,12 +44,9 @@ public class App
     CircularQueuePlaylist leftPanelPlaylist = new CircularQueuePlaylist(new ArrayList<String>(SidePanel.photoMRLS(true)));
     CircularQueuePlaylist rightPanelPlaylist = new CircularQueuePlaylist(new ArrayList<String>(SidePanel.photoMRLS(false)));
     CircularQueuePlaylist videoPlaylist = new CircularQueuePlaylist(new ArrayList<String>(VideoPanel.videoMRLS()));
-
-    System.out.println(AppFrame.device.getDisplayMode().getWidth());
-    System.out.println(AppFrame.device.getDisplayMode().getHeight());
     
     final int screenWidth = AppFrame.device.getDisplayMode().getWidth();
-    final int screenHeight = AppFrame.device.getDisplayMode().getWidth();
+    final int screenHeight = AppFrame.device.getDisplayMode().getHeight();
 
     //panels.
     SidePanel left = new SidePanel(leftPanelPlaylist.current(), screenWidth/3, screenHeight);
