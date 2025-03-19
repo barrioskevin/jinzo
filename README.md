@@ -119,7 +119,7 @@ Sequential runs should automatically start the engagment player in fullscreen.
 
 - vlcj 4.10.1 (vlc bindings)
 - apache commons 2.18.0 (file utils)
-- imgscalr 4.2 (currently not in use)
+- imgscalr 4.2 (for rescaling the side panel images)
 - scala3-library (currently not in use)
 - Junit 5.11 (i need to write tests)
 
@@ -131,6 +131,9 @@ I'm currently trying to modularize as much as I can in the project to allow for 
 
 # Known Issues
 
+
+- I'm really trying to focus on getting the main engagement frame to look good on multiple resoultions. I've really only been testing on my laptop which is 1920x1080 however not all screens are this resolution, especially TV screens. So, the few times where I have gotten to test different resolutions I came up with a scaling technique that will scale the side panel images based on the actual displays size and while it works fine I think there still appears to be some parts of the image not showing up properly (edges get trimmed slightly). I'm currently trying to find a way where I can reliably test different resolutions to better the current code I have for scaling.
+- Another thing I really need to consider is how we can tell the program what videos and images to display. Currently my solutions have been coded into the application but I think I need to come up with a sort of configuration file so that it can load and display different videos and images on each run. I came across the issue when I had to set up this program on two seperate devices with both of them needing different images. I think I'm going to lean towards command line arguments for now and see if I can get that working.
 - I will sometimes get a `java.net.SocketTimeException` or a `java.net.UnknownHostException`, from what I understand this is just my app timing out when trying to reach google drive. I'm not sure if there is anything I can do programatically but I have to make sure that my app is prepared for a failure like this. Before I would get video playback errors because I was deleting videos with the assumption that I would be able to download them again right way, but if I ever time out then the player will have nothing to play.
 - There was some cases of exceptions crashing the program due to not finding certain files or directories, I tried to clean it up as much as I could by automatically creating directories if needed and using try catch where ever possible, but if paths aren't loaded in properly from `application.properties` the app could fail.
 - Because the app installs using the $HOME enviornment variable there is not really compatability with non Unix systems so we need to change the start up in the Config class.
