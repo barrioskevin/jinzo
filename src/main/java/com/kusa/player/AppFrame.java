@@ -35,7 +35,8 @@ public class AppFrame extends JFrame
   public static GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
 
   private SidePanel leftPanel;
-  private VideoPanel middlePanel;
+  private GstPanel middlePanel;
+  private VideoPanel middlePanel_;
   private SidePanel rightPanel;
   private JPanel contentPane;
   //private CustomSidePanel rightPanel_;
@@ -52,13 +53,46 @@ public class AppFrame extends JFrame
    *  - add in all the panels to this engagment frames layout.
    *  - sets frame properties such as undecorated and visible to true.
    */
-  public AppFrame(SidePanel leftPanel, SidePanel rightPanel, VideoPanel middlePanel)
+  public AppFrame(SidePanel leftPanel, SidePanel rightPanel, GstPanel middlePanel)
   {
     this.leftPanel = leftPanel;
     this.rightPanel = rightPanel;
     this.middlePanel = middlePanel;
 
     setUndecorated(true);
+    
+
+    addWindowListener(new WindowAdapter() {
+      @Override 
+      public void windowClosing(WindowEvent e)
+      {
+        //middlePanel.release();
+        System.exit(0); //app quits when main frame is closed.
+      }
+    });
+
+    contentPane = new JPanel();
+
+    contentPane.setLayout(new BorderLayout());
+
+    
+
+    contentPane.add(leftPanel, BorderLayout.WEST);
+    contentPane.add(middlePanel, BorderLayout.CENTER);
+    contentPane.add(rightPanel, BorderLayout.EAST);
+
+    setContentPane(contentPane);
+    setVisible(true);
+  }
+  public AppFrame(SidePanel leftPanel, SidePanel rightPanel, VideoPanel middlePanel)
+  {
+    this.leftPanel = leftPanel;
+    this.rightPanel = rightPanel;
+    this.middlePanel_ = middlePanel;
+
+    setUndecorated(true);
+    
+
     addWindowListener(new WindowAdapter() {
       @Override 
       public void windowClosing(WindowEvent e)
@@ -80,9 +114,8 @@ public class AppFrame extends JFrame
 
     setContentPane(contentPane);
     setVisible(true);
-
-    
   }
+
 
   /** Toggles full screen on systems main device.
    *
