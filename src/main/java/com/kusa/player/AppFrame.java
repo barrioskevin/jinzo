@@ -20,12 +20,9 @@ import javax.swing.JPanel;
  * Class representing the main frame.
  * aka: EngagmentFrame (will rename soon).
  *
- * This class is the heart of the application it will be what is running on the applications
- * window.
  */
 public class AppFrame extends JFrame
 {
-
   /**
    * GraphicsDevice of the screen that the device is running on.
    *
@@ -38,14 +35,10 @@ public class AppFrame extends JFrame
   private VideoPanel middlePanel;
   private SidePanel rightPanel;
   private JPanel contentPane;
-  //private CustomSidePanel rightPanel_;
 
   /**
    * Constructs the engagment frame from two side panels and a video panel.
    * 
-   * While right now this engagment frame is handling alot I eventually want to add
-   * paramters for this constructor insttead of internally creating the panels.
-   *
    * Operations:
    *  - sets the private variables.
    *  - Constructs the content pane where panels will be added.
@@ -59,6 +52,7 @@ public class AppFrame extends JFrame
     this.middlePanel = middlePanel;
 
     setUndecorated(true);
+
     addWindowListener(new WindowAdapter() {
       @Override 
       public void windowClosing(WindowEvent e)
@@ -72,18 +66,14 @@ public class AppFrame extends JFrame
 
     contentPane.setLayout(new BorderLayout());
 
-    
-
     contentPane.add(leftPanel, BorderLayout.WEST);
     contentPane.add(middlePanel, BorderLayout.CENTER);
     contentPane.add(rightPanel, BorderLayout.EAST);
 
     setContentPane(contentPane);
     setVisible(true);
-
-    
   }
-
+  
   /** Toggles full screen on systems main device.
    *
    * displays this frame on full screen or returns to windowed.

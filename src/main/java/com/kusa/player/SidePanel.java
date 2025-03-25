@@ -111,7 +111,7 @@ public class SidePanel extends JPanel
     int height = imageLabel.getIcon().getIconHeight();
     try{
       newImage = ImageIO.read(new File(path));
-      newScaledImage = Scalr.resize(originalImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_TO_WIDTH, width);
+      newScaledImage = Scalr.resize(newImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_TO_WIDTH, width);
       ImageIcon newIcon = new ImageIcon(newScaledImage);
       imageLabel.setIcon(newIcon);
     }catch(Exception e)
