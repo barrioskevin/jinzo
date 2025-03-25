@@ -1,8 +1,6 @@
 package com.kusa;
 
 import com.kusa.service.GDriveService;
-import org.freedesktop.gstreamer.Gst;
-import org.freedesktop.gstreamer.Version;
 
 /**
  * Main class.
@@ -18,7 +16,6 @@ public class App
   public static void main(String args[])
   {
     //init deps
-    Gst.init(Version.BASELINE, "JINZO", args);
     GDriveService gds = new GDriveService();
 
     //initial downloads.
@@ -26,6 +23,5 @@ public class App
       gds.downloadMedia();
 
     VlcjApp.exec(gds);
-    //GstApp.exec(gds);
   }
 }
