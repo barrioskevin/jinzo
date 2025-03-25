@@ -5,7 +5,6 @@ import com.kusa.playlist.Playlist;
 
 import java.util.Set;
 
-//60000, 300000); //every 5 min
 public class UpdateSidePanel implements Runnable
 {
   private SidePanel panel;
@@ -21,19 +20,18 @@ public class UpdateSidePanel implements Runnable
   @Override
   public void run()
   {
-    if(playlist.index() != playlist.size() - 1)
+    if(playlist.index() == 0)
     {
-      panel.setImage(playlist.next());
-      return;
-    }
-    System.out.println("[end of panel playlist!]");
+      System.out.println("[clearing playlist!]");
 
-    Set<String> photos = SidePanel.photoMRLS(isLeft);
-    if(!photos.isEmpty())
-    {
-      playlist.clear();
-      for(String pic : photos)
-        playlist.add(pic);
+      //the photos come from side panel static method.
+      Set<String> photos = SidePanel.photoMRLS(isLeft);
+      if(!photos.isEmpty())
+      {
+        playlist.clear();
+        for(String pic : photos)
+          playlist.add(pic);
+      }
     }
     panel.setImage(playlist.next());
   }
