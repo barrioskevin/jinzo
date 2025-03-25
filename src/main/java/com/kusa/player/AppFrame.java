@@ -53,17 +53,7 @@ public class AppFrame extends JFrame
 
     setUndecorated(true);
 
-    addWindowListener(new WindowAdapter() {
-      @Override 
-      public void windowClosing(WindowEvent e)
-      {
-        middlePanel.release();
-        System.exit(0); //app quits when main frame is closed.
-      }
-    });
-
     contentPane = new JPanel();
-
     contentPane.setLayout(new BorderLayout());
 
     contentPane.add(leftPanel, BorderLayout.WEST);
@@ -74,6 +64,9 @@ public class AppFrame extends JFrame
     setVisible(true);
   }
   
+  //release the vlcj panel on 'shutdown'
+  public void shutdown() { middlePanel.release(); }
+
   /** Toggles full screen on systems main device.
    *
    * displays this frame on full screen or returns to windowed.
