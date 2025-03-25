@@ -14,6 +14,19 @@ import java.util.List;
  * <p>an attempt to manage the internal directories seamlessly
  *
  * <p>appPath - where the app will "install" currently platform specific might not work on windows.
+ *
+ * -- roadmap ---
+ *  I need to make sure that the properites file loaded includes all the needed properites.
+ *
+ *    Service related hm...
+ *    # token storage path - (if using google drive api)
+ *    # app credentials.json - (if using google drive api)
+ *    # local map of google drive path - (where downloaded drive files go)
+ *
+ *    Panels related. (telling what media to grab)
+ *    # location - sub directory to search when grabbing photos.
+ *
+ *  maybe we can have some sort of specification of playlist inside the config file?
  */
 public class Config {
   // this is platform specific. it should work fine on unix
@@ -67,9 +80,11 @@ public class Config {
             "[SUCSSESS] loaded properties file: %s\n", propertyFile.getAbsolutePath());
       }
 
-      System.out.println(getProperty("downloadPath"));
-      System.out.println(getProperty("tokenStoragePath"));
-      System.out.println(getProperty("googleCredentialsPath"));
+      System.out.println("Using download path:" + getProperty("downloadPath"));
+      System.out.println("Using token path:" + getProperty("tokenStoragePath"));
+      System.out.println("Using google credential path:" + getProperty("googleCredentialsPath"));
+      System.out.println("Using location:" + getProperty("location"));
+
       File driveFolder = new File(getProperty("downloadPath"));
       if (!driveFolder.exists())
         if (!driveFolder.mkdirs()) System.out.println("FAILED TO FIND OR CREATE DRIVE FOLDER.");
@@ -125,6 +140,7 @@ public class Config {
     final String tokenStorage = "tokenStoragePath=" + appPath + "tokens/";
     final String googleCreds = "googleCredentialsPath=" + appPath + "credentials.json";
     final String downloadPath = "downloadPath=" + appPath + "drive/";
+    final String locationDir = "location=";
     List<String> properties = List.of(tokenStorage, googleCreds, downloadPath);
     try {
       Files.write(Paths.get(file.getAbsolutePath()), properties);
