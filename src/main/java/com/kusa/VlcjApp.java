@@ -3,6 +3,8 @@ package com.kusa;
 import com.kusa.player.AppFrame;
 import com.kusa.player.SidePanel;
 import com.kusa.player.VideoPanel;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import com.kusa.playlist.Playlist;
 import com.kusa.playlist.CircularQueuePlaylist;
@@ -44,12 +46,24 @@ public class VlcjApp
     VideoPanel middle = new VideoPanel(videoPlaylist, gds);
 
     //schedule tasks.
-    executor.schedule(new DownloadFromDrive(gds), 3L, TimeUnit.MINUTES);
-    executor.schedule(new UpdateSidePanel(left, leftPanelPlaylist, true), 5L, TimeUnit.MINUTES);
-    executor.schedule(new UpdateSidePanel(right, rightPanelPlaylist, false), 5L, TimeUnit.MINUTES);
+    executor.scheduleAtFixedRate(new DownloadFromDrive(gds), 0L, 30L, TimeUnit.SECONDS);
+    executor.scheduleAtFixedRate(new UpdateSidePanel(left, leftPanelPlaylist, true), 0L, 5L, TimeUnit.MINUTES);
+    executor.scheduleAtFixedRate(new UpdateSidePanel(right, rightPanelPlaylist, false), 0L, 5L, TimeUnit.MINUTES);
 
-    //create and play engagement frame.
+    //create engagement frame + add shutdown.
     AppFrame engagementFrame = new AppFrame(left, right, middle);
+    engagementFrame.addWindowListener(new WindowAdapter() {
+      @Override 
+      public void windowClosing(WindowEvent e)
+      {
+        System.out.println("JINZO QUITTING...");
+        engagementFrame.shutdown();
+        executor.shutdownNow();
+        System.exit(0); //app quits when main frame is closed.
+      }
+    });
+      
+    //set fullscreen and play the video panel
     engagementFrame.fullscreen();
     middle.play();
   }
