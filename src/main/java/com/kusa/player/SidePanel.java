@@ -18,10 +18,13 @@ import javax.swing.ImageIcon;
 import javax.swing.BorderFactory;
 import java.awt.GridLayout;
 
+import com.kusa.service.LocalService;
+import com.kusa.Config;
+
 import java.time.LocalDateTime;
 import java.time.DayOfWeek;
 import java.util.Set;
-import com.kusa.service.LocalService;
+import java.util.HashSet;
 
 /**
  * Class for managing a side panel of an engagment frame.
@@ -128,46 +131,38 @@ public class SidePanel extends JPanel
    */
   public static Set<String> photoMRLS(boolean leftPanel)
   {
-    String dir = leftPanel ? "photos/left/" : "photos/right/";
-    switch(LocalDateTime.now().getDayOfWeek())
+    String location = Config.getProperty("location");
+
+    String dir = String.format("photos/%s%s", location, (leftPanel ? "left/" : "right/"));
+    //String dir = leftPanel ? "photos/left/" : "photos/right/";
+    System.out.println("[PHOTO MRLS] LOOKING IN DIR: " + dir);
+    Set<String> photos = new HashSet<>();
+    switch(LocalDateTime.now().getDayOfWeek()) 
     {
       case MONDAY:
-        Set<String> mondayMRLS = LocalService.getLocalMRLS(dir+"monday/", true);
-        if(!mondayMRLS.isEmpty())
-          return mondayMRLS;
+        photos.addAll(LocalService.getLocalMRLS(dir+"monday/", true));
         break;
       case TUESDAY:
-        Set<String> tuesdayMRLS = LocalService.getLocalMRLS(dir+"tuesday/", true);
-        if(!tuesdayMRLS.isEmpty())
-          return tuesdayMRLS;
+        photos.addAll(LocalService.getLocalMRLS(dir+"tuesday/", true));
         break;
       case WEDNESDAY:
-        Set<String> wednesdayMRLS = LocalService.getLocalMRLS(dir+"wednesday/", true);
-        if(!wednesdayMRLS.isEmpty())
-          return wednesdayMRLS;
+        photos.addAll(LocalService.getLocalMRLS(dir+"wednesday/", true));
         break;
       case THURSDAY:
-        Set<String> thursdayMRLS = LocalService.getLocalMRLS(dir+"thursday/", true);
-        if(!thursdayMRLS.isEmpty())
-          return thursdayMRLS;
+        photos.addAll(LocalService.getLocalMRLS(dir+"thursday/", true));
         break;
       case FRIDAY:
-        Set<String> fridayMRLS = LocalService.getLocalMRLS(dir+"friday/", true);
-        if(!fridayMRLS.isEmpty())
-          return fridayMRLS;
+        photos.addAll(LocalService.getLocalMRLS(dir+"friday/", true));
         break;
       case SATURDAY:
-        Set<String> saturdayMRLS = LocalService.getLocalMRLS(dir+"saturday/", true);
-        if(!saturdayMRLS.isEmpty())
-          return saturdayMRLS;
+        photos.addAll(LocalService.getLocalMRLS(dir+"saturday/", true));
         break;
       case SUNDAY:
-        Set<String> sundayMRLS = LocalService.getLocalMRLS(dir+"sunday/", true);
-        if(!sundayMRLS.isEmpty())
-          return sundayMRLS;
+        photos.addAll(LocalService.getLocalMRLS(dir+"sunday/", true));
         break;
     }
+
     //default, MIGHT be empty.
-    return LocalService.getLocalMRLS(dir, false);
+    return !photos.isEmpty() ? photos : LocalService.getLocalMRLS(dir, false);
   } 
 }
