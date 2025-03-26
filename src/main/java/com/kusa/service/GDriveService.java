@@ -94,11 +94,12 @@ public class GDriveService
       drive = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT)).setApplicationName(googleAppName).build();
       valid = findAppFolder();
       if(!valid)
-        System.out.println("Failed to launch gdrive service. COULDNT FIND APP FOLDER");
+        log("failed to launch gdrive service, app folder " + MAIN_FOLDER_NAME + " not found.");
     }
     catch(Exception e)
     {
-      System.out.println("Failed to launch gdrive service." + e);
+      log("failed to launch gdrive service. (see stack trace)");
+      e.printStackTrace();
       valid = false;
     }
     finally
@@ -115,12 +116,12 @@ public class GDriveService
   public boolean isValid() { 
     if(!this.valid)
     {
-      System.out.println("GDS SERVICE IS INVLALID ATTEMPTING TO VALIDATE");
+      log("service invalid.. starting attemptt to revalidate");
       init();
     }
 
     if(this.valid)
-      System.out.println("GDS SERVICE IS VALID!");
+      log("SERVICE IS VALID!");
 
     return this.valid;
   }
@@ -150,7 +151,7 @@ public class GDriveService
     }
     catch(Exception e)
     {
-      System.out.println("GDS FAILURE: FAILED TO FIND NEEDED FOLDERS IN DRIVEE!!!");
+      log("failure, " + MAIN_FOLDER_NAME + " not found! (see stack trace)");
       e.printStackTrace();
       return false;
     }
@@ -173,7 +174,7 @@ public class GDriveService
 
     LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
     Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
-    System.out.printf("YOUR DRIVE CREDENTIALS EXPIRES IN %d SECONDS.\n", credential.getExpiresInSeconds());
+    System.out.println(String.format("[GDriveService (static)] Credentials expires in %d seconds", credential.getExpiresInSeconds()));
     return credential;
   }
 
@@ -198,7 +199,7 @@ public class GDriveService
       boolean skipSearch = true;
       if(!nestedFolders.equals(""))
       {
-        System.out.println("GETTING FILES FROM GOOGLE DRIVE SEARCHING FOR START DIR: " + nestedFolders);
+        log("getting file list, using dir: " + nestedFolders);
         skipSearch = false;
       }
 
@@ -214,15 +215,13 @@ public class GDriveService
           FileList result = drive.files().list().setQ(query).setFields("nextPageToken, files(id, name, parents, description, mimeType)")
             .setPageToken(pageToken).execute();
           if(result.getNextPageToken() != null)
-          {
-            System.out.println("NEXT PAGE TOKEN: " + result.getNextPageToken());
-          }
+            log("got a next page token!"); //result.getNextPageToken()
           if(result.getIncompleteSearch() != null)
             if(result.getIncompleteSearch())
-              System.out.println("GDS: INCOMPLETE SEARCH OCCURED IN GET FILE LIST");
+              log("incomplete search occured in getFileList()");
           pageToken = result.getNextPageToken();
           List<File> folderFiles = result.getFiles();
-          System.out.println("GDS: FOUND " + folderFiles.size() + " FILES IN :/" + path);
+          log(String.format("found %d files in :/%s", folderFiles.size(), path));
           for(File file : folderFiles)
           {
             if(file.getMimeType().equals(FOLDER_MIME_TYPE)
@@ -252,12 +251,10 @@ public class GDriveService
           FileList result = drive.files().list().setQ(query).setFields("nextPageToken, files(id, name, parents, description, mimeType)")
             .setPageToken(pageToken).execute();
           if(result.getNextPageToken() != null)
-          {
-            System.out.println("NEXT PAGE TOKEN: " + result.getNextPageToken());
-          }
+            log("got a next page token!"); //result.getNextPageToken()
           if(result.getIncompleteSearch() != null)
             if(result.getIncompleteSearch())
-              System.out.println("GDS: INCOMPLETE SEARCH OCCURED IN GET FILE LIST");
+              log("incomplete search occured in getFileList() 2nd half");
           pageToken = result.getNextPageToken();
           List<File> folderFiles = result.getFiles();
           for(File file : folderFiles)
@@ -274,9 +271,9 @@ public class GDriveService
     }
     catch(Exception e)
     {
-      System.out.println("GDriveService: Failed to get files. " + e + e.getMessage()); 
+      log("failed to get files (see stack trace)");
       e.printStackTrace();
-      System.out.println("GDriveService: Setting valid to FALSE"); 
+      log("set valid to FALSE");
       this.valid = false;
       return Collections.emptyList();
     }
@@ -307,13 +304,13 @@ public class GDriveService
       drive.files().get(id).executeMediaAndDownloadTo(os);
       FileOutputStream fos = new FileOutputStream(path + name);
       os.writeTo(fos);
-      System.out.printf("SUCCESSFULLY DOWNLOADED NEW FILE\n file:%s\n driveID:%s\n path:%s\n", name, id, path);
+      log(String.format("SUCCESSFULLY DOWNLOADED NEW FILE\n file:%s\n driveID:%s\n path:%s\n", name, id, path));
       return true;
     }
     catch(Exception e)
     {
-      System.out.printf("download failed!\n name:%s\n id:%s", name, id);
-      System.out.println(e.getMessage());
+      log(e.getMessage());
+      log(String.format("download failed! (see stack trace).\n name:%s\n id:%s", name, id));
       e.printStackTrace();
       return false;
     }
@@ -326,10 +323,10 @@ public class GDriveService
       List<PathedFile> files = getFileList();
       if(files.isEmpty())
       {
-        System.out.println("GDriveService: GOT NO FILES FROM CALLING GET FILES WILL SKIP DOWNLOADS");
+        log("getFileList() got no files we are going to early exit downloadMedia()");
         return false;
       }
-      System.out.println("gds: starting downloads... ");
+      log("downloading media...");
       for(PathedFile pf : files)
       {
         LocalService.checkDir(Config.getProperty("downloadPath") + pf.path());
@@ -338,12 +335,18 @@ public class GDriveService
           if(downloadPathedFile(pf)) //DOWNLOAD DRIVE FILE.
             changed = true;
       }
+      log("media downloads complete.");
       return changed;
     } catch(Exception e)
     {
-      System.out.println("FAILED TO PULL DRIVE FILES.");
+      log("failed to pull drive files (see stack trace)");
       e.printStackTrace();
       return false;
     }
+  }
+
+  private void log(String message)
+  {
+    System.out.println("[GDriveService] " + message);
   }
 }
