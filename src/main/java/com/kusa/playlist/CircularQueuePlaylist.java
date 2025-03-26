@@ -178,12 +178,14 @@ public class CircularQueuePlaylist implements Playlist
    * be careful calling this right after next, it will
    * be two different mrls.
    *
+   * broken 
+   *
    * @return String of MRL at index of playlist. 
    */
   @Override
   public String current() 
   { 
-    if(size() > 0 && mrls.get(index) != null)
+    if(size() > 0 && index < size() && mrls.get(index) != null)
       return mrls.get(index);
     return "";
   }
