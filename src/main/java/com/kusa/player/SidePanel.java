@@ -79,7 +79,7 @@ public class SidePanel extends JPanel
       scaledImage = Scalr.resize(originalImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_TO_WIDTH, width);
     }catch(Exception e)
     {
-      System.out.println("IMAGE " + path + " FAILED TO LOAD");
+      System.out.println("[SidePanel] IMAGE " + path + " FAILED TO LOAD");
       scaledImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
       Graphics g = scaledImage.getGraphics();
       g.setColor(Color.BLACK);
@@ -119,7 +119,7 @@ public class SidePanel extends JPanel
       imageLabel.setIcon(newIcon);
     }catch(Exception e)
     {
-      System.out.println("FAILED TO SET NEW IMAGE: " + path);
+      System.out.println("[SidePanel] FAILED TO SET NEW IMAGE: " + path);
     }
   }
 
@@ -134,8 +134,6 @@ public class SidePanel extends JPanel
     String location = Config.getProperty("location");
 
     String dir = String.format("photos/%s%s", location, (leftPanel ? "left/" : "right/"));
-    //String dir = leftPanel ? "photos/left/" : "photos/right/";
-    System.out.println("[PHOTO MRLS] LOOKING IN DIR: " + dir);
     Set<String> photos = new HashSet<>();
     switch(LocalDateTime.now().getDayOfWeek()) 
     {

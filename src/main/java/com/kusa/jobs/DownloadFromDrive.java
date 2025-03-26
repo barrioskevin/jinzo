@@ -12,20 +12,36 @@ import java.time.LocalDateTime;
 public class DownloadFromDrive implements Runnable
 {
   private GDriveService gds;
-  public DownloadFromDrive(GDriveService gds) { this.gds = gds; }
+  private int min;
+  private int max;
+
+  public DownloadFromDrive(GDriveService gds) { this(gds, 0, 0); }
+  public DownloadFromDrive(GDriveService gds, int hourRangeMin, int hourRangeMax)
+  {
+    this.gds = gds;
+    this.min = hourRangeMin;
+    this.max = hourRangeMax;
+  }
   @Override
   public void run()
   {
-    //playlist or video player won't be bothered between 12am - 8am
+    //wont download any files if called between min(inclusive) - max(exclusive)
     int hour = LocalDateTime.now().getHour(); 
-    if(hour >= 0 && hour < 8)
+    if(hour >= min && hour < max)
     {
-      System.out.println("IT IS CURRENTLY THE " + hour + " HOUR SO WE WILL NOT MODIFY PLAYLIST OR USE SERVICES.");
+      log(String.format("it is currently the %d hour, so we will not use drive service.", hour));
       return;
     }
     //calls to is valid will
     //attempt to revalidate the drive service.
     if(gds.isValid())
       gds.downloadMedia();
+    else
+      log("gds is invalid.");
+  }
+
+  private void log(String message)
+  {
+    System.out.println("[DownloadFromDrive] " + message);
   }
 }

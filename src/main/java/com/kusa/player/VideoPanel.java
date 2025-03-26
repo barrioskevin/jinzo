@@ -53,15 +53,15 @@ public class VideoPanel extends EmbeddedMediaPlayerComponent
       public void finished(MediaPlayer mp)
       {
         if(playlist.isEmpty())
-          System.out.println("WARNING THE VIDEO PLAYER CURRENTLY HAS AN EMPTY PLAYLIST");
+          log("WARNING the video panel playlist is empty!!!");
 
-        System.out.println("A VIDEO FINISHED.");
+        log("a video just finished.");
         Set<String> driveMrls = new HashSet<>();
 
         boolean willShuffle = false;
         if(playlist.index() == 0)
         {
-          System.out.println("PLAYLIST OVER CLEARING THE PLAYLIST");
+          log("playlist ended! calling clear...");
           playlist.clear();
           willShuffle = true;
         }
@@ -72,28 +72,29 @@ public class VideoPanel extends EmbeddedMediaPlayerComponent
         {
           if(!currentTracks.contains(video))
           {
-            System.out.println("ADDING NEW " + video + " TO PLAYLIST");
+            log(String.format("found new video! adding %s to playlist.", video));
             playlist.add(video);
           }
         }
 
         if(willShuffle)
         {
-          System.out.println("SHUFFLING PLAYLIST");
+          log("Shuffling Playlist!");
           playlist.shuffle();
 
-          System.out.println("PLAYING NEW PLAYLIST! INDEX: " + playlist.index());
+          log(String.format("Start of new playlist! Index = ", playlist.index()));
           List<String> tracks = playlist.trackList();
           for(int i = 0; i < tracks.size(); i++)
-            System.out.println(" " + i + tracks.get(i));
+            log(String.format(" [%d] : %s", i, tracks.get(i)));
         }
 
         final int idx = playlist.index();
         final String mrl = playlist.next();
 
         mediaPlayer().submit(() -> mediaPlayer().media().play(mrl, "--avcodec-hw=mmal", "--no-xlib", "--no-osd", "--no-interact", "--no-video-filter", "--quiet"));
-        System.out.printf("NOW PLAYING %d : %s \n", idx, mrl);
-        System.out.printf("NEXT INDEX %d\n", playlist.index());
+
+        log(String.format("Now playing:\n [index]%d\n [vid]:%s", idx, mrl));
+        log(String.format("Next index should be %d", playlist.index()));
       }
     });
   }
@@ -113,7 +114,7 @@ public class VideoPanel extends EmbeddedMediaPlayerComponent
     final int idx = playlist.index();
     final String mrl = playlist.next();
     mediaPlayer().media().play(mrl);
-    System.out.printf("NOW STARTING %d : %s \n", idx, mrl);
+    log(String.format("Starting video panel.\n [index]:%d\n [vid]:%s", idx, mrl));
   }
 
 
@@ -155,6 +156,11 @@ public class VideoPanel extends EmbeddedMediaPlayerComponent
         break;
     }
     return mrls;
+  }
+
+  private void log(String message)
+  {
+    System.out.println("[VideoPanel] " + message);
   }
 
 }
