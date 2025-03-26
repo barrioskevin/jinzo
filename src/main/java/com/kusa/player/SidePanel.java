@@ -76,7 +76,7 @@ public class SidePanel extends JPanel
      */
     try{
       originalImage = ImageIO.read(new File(path));
-      scaledImage = Scalr.resize(originalImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_TO_WIDTH, width);
+      scaledImage = Scalr.resize(originalImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_EXACT, width, height);
     }catch(Exception e)
     {
       System.out.println("[SidePanel] IMAGE " + path + " FAILED TO LOAD");
@@ -114,7 +114,8 @@ public class SidePanel extends JPanel
     int height = imageLabel.getIcon().getIconHeight();
     try{
       newImage = ImageIO.read(new File(path));
-      newScaledImage = Scalr.resize(newImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_TO_WIDTH, width);
+      newScaledImage = Scalr.resize(newImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_EXACT, width, height);
+      //newScaledImage = Scalr.resize(newImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_TO_WIDTH, width);
       ImageIcon newIcon = new ImageIcon(newScaledImage);
       imageLabel.setIcon(newIcon);
     }catch(Exception e)
