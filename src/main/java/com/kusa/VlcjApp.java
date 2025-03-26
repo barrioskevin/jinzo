@@ -5,6 +5,8 @@ import com.kusa.player.SidePanel;
 import com.kusa.player.VideoPanel;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 import com.kusa.playlist.Playlist;
 import com.kusa.playlist.CircularQueuePlaylist;
@@ -19,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.swing.SwingUtilities;
 /**
  * vlcj app class.
  *
@@ -46,7 +49,7 @@ public class VlcjApp
     VideoPanel middle = new VideoPanel(videoPlaylist, gds);
 
     //schedule tasks.
-    executor.scheduleAtFixedRate(new DownloadFromDrive(gds), 0L, 30L, TimeUnit.SECONDS);
+    executor.scheduleAtFixedRate(new DownloadFromDrive(gds, 12, 8), 0L, 3L, TimeUnit.MINUTES);
     executor.scheduleAtFixedRate(new UpdateSidePanel(left, leftPanelPlaylist, true), 0L, 5L, TimeUnit.MINUTES);
     executor.scheduleAtFixedRate(new UpdateSidePanel(right, rightPanelPlaylist, false), 0L, 5L, TimeUnit.MINUTES);
 
@@ -62,7 +65,18 @@ public class VlcjApp
         System.exit(0); //app quits when main frame is closed.
       }
     });
-      
+    engagementFrame.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyPressed(KeyEvent e)
+      {
+        if(e.getKeyCode() == KeyEvent.VK_ESCAPE)
+        {
+          SwingUtilities.invokeLater(() -> engagementFrame.dispatchEvent(new WindowEvent(engagementFrame, WindowEvent.WINDOW_CLOSING)));
+        }
+      }
+    });
+    engagementFrame.setFocusable(true);
+
     //set fullscreen and play the video panel
     engagementFrame.fullscreen();
     middle.play();
