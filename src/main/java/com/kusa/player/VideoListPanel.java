@@ -54,6 +54,7 @@ public class VideoListPanel extends EmbeddedMediaListPlayerComponent
     gds = gds_;
 
     setOpaque(true); //maybe remove?
+    setCursorEnabled(false); //kind of works. (ONLY OVER VID PANEL)
                      
     //add all videos from playlist to media list.
     for(String video : playlist.trackList())
@@ -68,13 +69,6 @@ public class VideoListPanel extends EmbeddedMediaListPlayerComponent
 
     log(String.format("Now playing...\n [vid] %s\n [idx] %d", playlist.current(), playlist.index())); 
     playlist.next();
-  }
-
-  @Override
-  public void elementaryStreamSelected(MediaPlayer mp, TrackType type, int id)
-  {
-    log("selected a stream");
-    log("stream dimensions: " + mp.video().videoDimension());
   }
 
   @Override
