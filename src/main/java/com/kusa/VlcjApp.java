@@ -3,6 +3,7 @@ package com.kusa;
 import com.kusa.player.AppFrame;
 import com.kusa.player.SidePanel;
 import com.kusa.player.VideoPanel;
+import com.kusa.player.VideoListPanel;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.KeyAdapter;
@@ -46,7 +47,7 @@ public class VlcjApp
     //panels.
     SidePanel left = new SidePanel(leftPanelPlaylist.current(), screenWidth/3, screenHeight);
     SidePanel right = new SidePanel(rightPanelPlaylist.current(), screenWidth/3, screenHeight);
-    VideoPanel middle = new VideoPanel(videoPlaylist, gds);
+    VideoPanel middle = new VideoListPanel(videoPlaylist, gds);
 
     //schedule tasks.
     executor.scheduleAtFixedRate(new DownloadFromDrive(gds, 12, 8), 0L, 3L, TimeUnit.MINUTES);
@@ -60,9 +61,8 @@ public class VlcjApp
       public void windowClosing(WindowEvent e)
       {
         System.out.println("JINZO QUITTING...");
-        engagementFrame.shutdown();
+        engagementFrame.shutdown(); //shutsdown video panel 
         executor.shutdownNow();
-        System.exit(0); //app quits when main frame is closed.
       }
     });
     engagementFrame.addKeyListener(new KeyAdapter() {
@@ -79,6 +79,6 @@ public class VlcjApp
 
     //set fullscreen and play the video panel
     engagementFrame.fullscreen();
-    middle.play();
+    middle.start();
   }
 }
