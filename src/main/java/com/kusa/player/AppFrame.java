@@ -57,17 +57,22 @@ public class AppFrame extends JFrame
     contentPane.setLayout(new BorderLayout());
 
     contentPane.add(leftPanel, BorderLayout.WEST);
-    contentPane.add(middlePanel, BorderLayout.CENTER);
+    contentPane.add(middlePanel.panel(), BorderLayout.CENTER);
     contentPane.add(rightPanel, BorderLayout.EAST);
 
     setContentPane(contentPane);
     setVisible(true);
   }
   
-  //release the vlcj panel on 'shutdown'
-  public void shutdown() { middlePanel.release(); }
+  /**
+   * Calls shutdown implementation on frames video panel.
+   *
+   * could perform other shutdown related things here.
+   */
+  public void shutdown() { middlePanel.shutdown(); }
 
-  /** Toggles full screen on systems main device.
+  /** 
+   * Toggles this frame to be full screen on systems main device.
    *
    * displays this frame on full screen or returns to windowed.
    */
