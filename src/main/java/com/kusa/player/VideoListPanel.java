@@ -58,6 +58,7 @@ public class VideoListPanel extends EmbeddedMediaListPlayerComponent implements 
   public void playing(MediaPlayer mp)
   {
     //ensure correct scaling for frame based on video and container size.
+    //  ** we can probably move this to elementaryStreamAdded event **
     mp.video().setScale(VideoPanel.calcScale(mp.video().videoDimension(), getSize()));
 
     log(String.format("Now playing...\n [vid] %s\n [idx] %d", playlist.current(), playlist.index())); 
@@ -135,20 +136,16 @@ public class VideoListPanel extends EmbeddedMediaListPlayerComponent implements 
   @Override
   public void stop()
   {
-    mediaListPlayer().submit(() -> mediaListPlayer().controls().stop());
+    mediaListPlayer().submit(
+        () -> mediaListPlayer().controls().stop()
+    );
   }
 
   @Override
-  public void shutdown()
-  {
-    this.release();
-  }
+  public void shutdown() { this.release(); }
 
   @Override
-  public JPanel panel()
-  {
-    return (JPanel) this;
-  }
+  public JPanel panel() { return (JPanel) this; }
   
   private void log(String message)
   {
