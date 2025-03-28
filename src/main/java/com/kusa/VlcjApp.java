@@ -56,21 +56,13 @@ public class VlcjApp
 
     //create engagement frame + add shutdown.
     AppFrame engagementFrame = new AppFrame(left, right, middle);
-    engagementFrame.addWindowListener(new WindowAdapter() {
-      @Override 
-      public void windowClosing(WindowEvent e)
-      {
-        System.out.println("JINZO QUITTING...");
-        engagementFrame.shutdown(); //shutsdown video panel 
-        executor.shutdownNow();
-      }
-    });
     engagementFrame.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e)
       {
         if(e.getKeyCode() == KeyEvent.VK_ESCAPE)
         {
+          executor.shutdownNow();
           SwingUtilities.invokeLater(() -> engagementFrame.dispatchEvent(new WindowEvent(engagementFrame, WindowEvent.WINDOW_CLOSING)));
         }
       }

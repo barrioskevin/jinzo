@@ -88,9 +88,18 @@ public class AppFrame extends JFrame
   /**
    * Calls shutdown implementation on frames video panel.
    *
-   * could perform other shutdown related things here.
+   * we do this internally on a window closed event.
+   *
+   * made this private so i dont try to shutdown more than once 
+   * (will segfault due to video panel's shutdown method).
+   *
+   * could perform other shutdown related things here so long
+   * as they are related to this frame in particular.
+   *
+   * other shutdown related things should be placed in the added 
+   * key adapter where we listen for the ESC key to quit.
    */
-  public void shutdown() { middlePanel.shutdown(); }
+  private void shutdown() { middlePanel.shutdown(); }
 
   /** 
    * Toggles this frame to be full screen on systems main device.
