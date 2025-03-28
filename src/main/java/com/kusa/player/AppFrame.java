@@ -1,9 +1,5 @@
 package com.kusa.player;
 
-import com.kusa.Config;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -15,6 +11,9 @@ import java.awt.GridLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import java.awt.event.FocusAdapter; 
+import java.awt.event.FocusEvent; 
+import javax.swing.WindowConstants;
 
 /**
  * Class representing the main frame.
@@ -51,7 +50,6 @@ public class AppFrame extends JFrame
     this.rightPanel = rightPanel;
     this.middlePanel = middlePanel;
 
-    setUndecorated(true);
 
     contentPane = new JPanel();
     contentPane.setLayout(new BorderLayout());
@@ -61,7 +59,30 @@ public class AppFrame extends JFrame
     contentPane.add(rightPanel, BorderLayout.EAST);
 
     setContentPane(contentPane);
+
+    setUndecorated(true);
     setVisible(true);
+    setFocusable(true);
+    setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
+    requestFocusInWindow();
+
+    addWindowListener(new WindowAdapter() {
+      @Override 
+      public void windowClosing(WindowEvent e){ shutdown(); }
+
+      @Override
+      public void windowActivated(WindowEvent e){ requestFocusInWindow(); }
+    });
+
+    //might not need but added cus sometimes the key adapter wouldnt work.
+    addFocusListener(new FocusAdapter(){
+      @Override
+      public void focusGained(FocusEvent e)
+      {
+        requestFocusInWindow();
+      }
+    });
   }
   
   /**
