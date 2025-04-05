@@ -116,6 +116,14 @@ public class Config {
         if (!playlist3.createNewFile())
           System.out.println("Failed to find or create playlist 3");
 
+      String full = props.getProperty("playlists");
+      String[] playlistFileNames = full.split(",");
+      for (String name : playlistFileNames)
+      {
+        final String playlistPath = name.replace("'", "").trim();
+        System.out.println("found playlist file: " + playlistPath);
+      }
+
 
     } catch (Exception e) {
       System.out.println("STARTUP FAILED!" + e);
