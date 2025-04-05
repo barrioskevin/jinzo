@@ -101,6 +101,22 @@ public class Config {
                 + " (DRIVE SERVICES WILL NOT WORK)!");
       }
 
+      File playlist1 = new File(props.getProperty("playlist1"));
+      if (!playlist1.exists())
+        if (!playlist1.createNewFile())
+          System.out.println("Failed to find or create playlist 1");
+
+      File playlist2 = new File(props.getProperty("playlist2"));
+      if (!playlist2.exists())
+        if (!playlist2.createNewFile())
+          System.out.println("Failed to find or create playlist 2");
+
+      File playlist3 = new File(props.getProperty("playlist3"));
+      if (!playlist3.exists())
+        if (!playlist3.createNewFile())
+          System.out.println("Failed to find or create playlist 3");
+
+
     } catch (Exception e) {
       System.out.println("STARTUP FAILED!" + e);
       System.out.println(e.getMessage());
@@ -141,7 +157,16 @@ public class Config {
     final String googleCreds = "googleCredentialsPath=" + appPath + "credentials.json";
     final String downloadPath = "downloadPath=" + appPath + "drive/";
     final String locationDir = "location=";
-    List<String> properties = List.of(tokenStorage, googleCreds, downloadPath);
+    final String p1 = "playlist1=" + appPath + "videopanel.playlist";
+    final String p2 = "playlist2=" + appPath + "leftpanel.playlist";
+    final String p3 = "playlist3=" + appPath + "rightpanel.playlist";
+    List<String> properties = List.of(
+        tokenStorage,
+        googleCreds,
+        downloadPath,
+        locationDir,
+        p1, p2, p3
+    );
     try {
       Files.write(Paths.get(file.getAbsolutePath()), properties);
     } catch (IOException ioException) {
