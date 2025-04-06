@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * Class for managing the applications configuration.
@@ -22,9 +23,6 @@ import java.util.List;
  *    # token storage path - (if using google drive api)
  *    # app credentials.json - (if using google drive api)
  *    # local map of google drive path - (where downloaded drive files go)
- *
- *    Panels related. (telling what media to grab)
- *    # location - sub directory to search when grabbing photos.
  *
  *  maybe we can have some sort of specification of playlist inside the config file?
  */
@@ -83,7 +81,6 @@ public class Config {
       System.out.println("Using download path:" + getProperty("downloadPath"));
       System.out.println("Using token path:" + getProperty("tokenStoragePath"));
       System.out.println("Using google credential path:" + getProperty("googleCredentialsPath"));
-      System.out.println("Using location:" + getProperty("location"));
 
       File driveFolder = new File(getProperty("downloadPath"));
       if (!driveFolder.exists())
@@ -101,27 +98,19 @@ public class Config {
                 + " (DRIVE SERVICES WILL NOT WORK)!");
       }
 
-      File playlist1 = new File(props.getProperty("playlist1"));
-      if (!playlist1.exists())
-        if (!playlist1.createNewFile())
-          System.out.println("Failed to find or create playlist 1");
-
-      File playlist2 = new File(props.getProperty("playlist2"));
-      if (!playlist2.exists())
-        if (!playlist2.createNewFile())
-          System.out.println("Failed to find or create playlist 2");
-
-      File playlist3 = new File(props.getProperty("playlist3"));
-      if (!playlist3.exists())
-        if (!playlist3.createNewFile())
-          System.out.println("Failed to find or create playlist 3");
-
       String full = props.getProperty("playlists");
       String[] playlistFileNames = full.split(",");
       for (String name : playlistFileNames)
       {
         final String playlistPath = name.replace("'", "").trim();
-        System.out.println("found playlist file: " + playlistPath);
+        File playlistFile = new File(playlistPath);
+        if (!playlistFile.exists())
+        {
+          if (!playlistFile.createNewFile())
+            System.out.println("Failed to find or create playlist " + playlistPath);
+          else
+            writeDefaultPlaylist(playlistFile);
+        }
       }
 
 
@@ -146,6 +135,20 @@ public class Config {
     return ((props == null) ? "" : props.getProperty(propName));
   }
 
+  /**
+   * Returns array of all the loaded playlist files.
+   *
+   */
+  public static String[] playlistFiles()
+  {
+    if(props == null || props.getProperty("playlists") == null)
+      return new String[0];
+
+    String full = props.getProperty("playlists");
+    String[] playlistFileNames = full.split(",");
+    return Arrays.stream(playlistFileNames).map(fileName -> fileName.replace("'", "").trim()).toArray(String[]::new);
+  }
+
   /*
    * When the app is first installing it will look for appliaction.properties in the
    * class path. if its not found it will look in our main install folder .jinzo/
@@ -164,21 +167,42 @@ public class Config {
     final String tokenStorage = "tokenStoragePath=" + appPath + "tokens/";
     final String googleCreds = "googleCredentialsPath=" + appPath + "credentials.json";
     final String downloadPath = "downloadPath=" + appPath + "drive/";
-    final String locationDir = "location=";
-    final String p1 = "playlist1=" + appPath + "videopanel.playlist";
-    final String p2 = "playlist2=" + appPath + "leftpanel.playlist";
-    final String p3 = "playlist3=" + appPath + "rightpanel.playlist";
+    final String defP1 = String.format("'%svideopanel.playlist'", appPath);
+    final String defP2 = String.format("'%sleftpanel.playlist'", appPath);
+    final String defP3 = String.format("'%srightpanel.playlist'", appPath);
+    final String playlists = String.format("playlists=%s, %s, %s", defP1, defP2, defP3);
     List<String> properties = List.of(
         tokenStorage,
         googleCreds,
         downloadPath,
-        locationDir,
-        p1, p2, p3
+        playlists
     );
     try {
       Files.write(Paths.get(file.getAbsolutePath()), properties);
     } catch (IOException ioException) {
       throw ioException;
+    }
+  }
+
+  private static void writeDefaultPlaylist(File file) {
+    List<String> sections = List.of(
+        "[videos]",
+        System.getProperty("user.home") + "/Videos/*",
+        "[photos]",
+        System.getProperty("user.home") + "/Photos/*",
+        "[monday]",
+        "[tuesday]",
+        "[wednesday]",
+        "[thursday]",
+        "[friday]",
+        "[saturday]",
+        "[sunday]"
+    );
+    try {
+      Files.write(Paths.get(file.getAbsolutePath()), sections);
+    } catch (IOException ioException) {
+      System.out.println("couldn't write default playlist to file.");
+      ioException.printStackTrace();
     }
   }
 }
