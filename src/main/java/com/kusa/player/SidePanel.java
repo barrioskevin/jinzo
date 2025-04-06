@@ -1,5 +1,7 @@
 package com.kusa.player;
 
+import com.kusa.util.PlaylistFile;
+
 import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -25,6 +27,8 @@ import java.time.LocalDateTime;
 import java.time.DayOfWeek;
 import java.util.Set;
 import java.util.HashSet;
+
+import java.io.IOException;
 
 /**
  * Class for managing a side panel of an engagment frame.
@@ -125,43 +129,23 @@ public class SidePanel extends JPanel
   }
 
   /**
-   * Returns the mrls for side panels of the day.
+   * Returns set of latest photo mrls based on the configured playlist. 
    *
-   * will default to just left or right if no daily images.
-   * @param leftPanel - true if you want get mrls of left panel.
+   * @param leftPanel true if we are reading the left panels playlist.
+   * @return set of mrls representing latest photos of playlist or empty if playlist file failed to read.
    */
   public static Set<String> photoMRLS(boolean leftPanel)
   {
-    String location = Config.getProperty("location");
-
-    String dir = String.format("photos/%s%s", location, (leftPanel ? "left/" : "right/"));
-    Set<String> photos = new HashSet<>();
-    switch(LocalDateTime.now().getDayOfWeek()) 
-    {
-      case MONDAY:
-        photos.addAll(LocalService.getLocalMRLS(dir+"monday/", true));
-        break;
-      case TUESDAY:
-        photos.addAll(LocalService.getLocalMRLS(dir+"tuesday/", true));
-        break;
-      case WEDNESDAY:
-        photos.addAll(LocalService.getLocalMRLS(dir+"wednesday/", true));
-        break;
-      case THURSDAY:
-        photos.addAll(LocalService.getLocalMRLS(dir+"thursday/", true));
-        break;
-      case FRIDAY:
-        photos.addAll(LocalService.getLocalMRLS(dir+"friday/", true));
-        break;
-      case SATURDAY:
-        photos.addAll(LocalService.getLocalMRLS(dir+"saturday/", true));
-        break;
-      case SUNDAY:
-        photos.addAll(LocalService.getLocalMRLS(dir+"sunday/", true));
-        break;
+    try {
+      String filePath = (leftPanel) ? Config.playlistFiles()[1] : Config.playlistFiles()[2];
+      PlaylistFile playlistFile = new PlaylistFile(filePath);
+      return new HashSet<String>(playlistFile.latest().trackList());
+    } catch (IOException ioe) {
+      ioe.printStackTrace();
+    } catch (Exception ex) {
+      //out of bounds maybe.
+      ex.printStackTrace();
     }
-
-    //default, MIGHT be empty.
-    return !photos.isEmpty() ? photos : LocalService.getLocalMRLS(dir, false);
-  } 
+    return new HashSet<String>();
+  }
 }
