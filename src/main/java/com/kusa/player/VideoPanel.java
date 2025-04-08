@@ -1,27 +1,23 @@
 package com.kusa.player;
 
-//panel reference
-import javax.swing.JPanel;
-
 //retreiving videos
 import com.kusa.Config;
 import com.kusa.service.LocalService;
 import com.kusa.util.PlaylistFile;
-import java.util.Set;
-import java.util.HashSet;
-import java.time.LocalDateTime;
-import java.time.DayOfWeek;
-
 //for calculatinng scale
 import java.awt.Dimension;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-
 //exceptions ?!
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+//panel reference
+import javax.swing.JPanel;
 
 public interface VideoPanel {
-
   /**
    * Will return the latest videos based on the configured playlist file.
    *
@@ -34,8 +30,7 @@ public interface VideoPanel {
    *
    * @return set of video paths from latest playlist or empty if playlist failed to read.
    */
-  public static Set<String> videoMRLS()
-  {
+  public static Set<String> videoMRLS() {
     try {
       //Config.playlistFiles()[0]
       // could be a property to have panel choose a playlist
@@ -65,21 +60,23 @@ public interface VideoPanel {
    *
    * @return float - scale needed to zoom video to fit container's dimensions.
    */
-  public static float calcScale(Dimension videoDimension, Dimension containerDimension)
-  {
-    float ws = (float)containerDimension.width / (float)videoDimension.width;
+  public static float calcScale(
+    Dimension videoDimension,
+    Dimension containerDimension
+  ) {
+    float ws = (float) containerDimension.width / (float) videoDimension.width;
     BigDecimal bd = new BigDecimal(Float.toString(ws));
     bd = bd.setScale(2, RoundingMode.HALF_UP);
     final float widthScale = bd.floatValue();
 
-    float hs = (float)containerDimension.height / (float)videoDimension.height;
+    float hs =
+      (float) containerDimension.height / (float) videoDimension.height;
     BigDecimal bd2 = new BigDecimal(Float.toString(hs));
     bd2 = bd2.setScale(2, RoundingMode.HALF_UP);
     final float heightScale = bd2.floatValue();
 
     return Math.max(widthScale, heightScale);
   }
-
 
   void start();
   void stop();

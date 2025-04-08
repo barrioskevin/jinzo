@@ -3,7 +3,6 @@ package com.kusa.playlist;
 import java.util.List;
 
 public interface Playlist {
-
   //controls
   String next();
   String skipTo(int pIndex);
