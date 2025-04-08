@@ -253,7 +253,7 @@ public class Config {
     List<String> sections = List.of(
       "[local-videos]",
       System.getProperty("user.home") + "/Videos/*",
-      "[drive-videos]"
+      "[drive-videos]",
       cachePath + "drive/videos/*",
       "[local-photos]",
       System.getProperty("user.home") + "/Photos/*",
