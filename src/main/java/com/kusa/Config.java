@@ -29,6 +29,8 @@ import java.util.Arrays;
 public class Config {
   // this is platform specific. it should work fine on unix
   private static final String appPath = System.getProperty("user.home") + "/.jinzo/";
+  private static final String cachePath = System.getProperty("user.home") + "/.cache/jinzo/";
+  private static final String configPath = System.getProperty("user.home") + "/.config/jinzo/";
   private static Properties props;
 
   /**
@@ -55,32 +57,28 @@ public class Config {
       try {
         // when developing you can have a defined properties file in the resources folder.
         // it requires recompilation upon editing.
-        props.load(Config.class.getResourceAsStream("/application.properties"));
+        props.load(Config.class.getResourceAsStream("/config"));
         propsLoaded = true;
-        System.out.println("Loaded local properties.");
+        System.out.println("[SUCSSES] (local) classpath/config loaded");
       } catch (Exception e) {
-        System.out.println("Couldnt find local properties");
+        System.out.println("[DEBUG] NO local properties found");
       }
 
-      File appFolder = new File(appPath);
-      if (!appFolder.exists())
-        if (!appFolder.mkdirs()) System.out.println("FAILED TO FIND OR CREATE APP FOLDER.");
-
       if (!propsLoaded) {
-        File propertyFile = new File(appPath + "application.properties");
+        File propertyFile = new File(configPath + "config");
         if (!propertyFile.exists()) {
-          System.out.println("writing a default properties file.");
+          System.out.println("creating default config file.");
           Files.createFile(Paths.get(propertyFile.getAbsolutePath()));
           writeDefaultAppProperties(propertyFile);
         }
         props.load(new FileReader(propertyFile));
         System.out.printf(
-            "[SUCSSESS] loaded properties file: %s\n", propertyFile.getAbsolutePath());
+            "[SUCSSES] %s loaded\n", propertyFile.getAbsolutePath());
       }
 
-      System.out.println("Using download path:" + getProperty("downloadPath"));
-      System.out.println("Using token path:" + getProperty("tokenStoragePath"));
-      System.out.println("Using google credential path:" + getProperty("googleCredentialsPath"));
+      System.out.println("[DEBUG] Google credentials found at:" + getProperty("googleCredentialsPath"));
+      System.out.println("[DEBUG] Reading tokens from:" + getProperty("tokenStoragePath"));
+      System.out.println("[DEBUG] Saving drive downloads to:" + getProperty("downloadPath"));
 
       File driveFolder = new File(getProperty("downloadPath"));
       if (!driveFolder.exists())
@@ -100,6 +98,11 @@ public class Config {
 
       String full = props.getProperty("playlists");
       String[] playlistFileNames = full.split(",");
+      if(playlistFileNames.length > 0)
+        System.out.printf("[DEBUG] Found %d playlists.\n", playlistFileNames.length);
+      else
+        System.out.printf("[ERROR] NO PLAYLIST FILES FOUND!\n");
+
       for (String name : playlistFileNames)
       {
         final String playlistPath = name.replace("'", "").trim();
@@ -164,12 +167,12 @@ public class Config {
    * with the value of it's default location.
    */
   private static void writeDefaultAppProperties(File file) throws IOException {
-    final String tokenStorage = "tokenStoragePath=" + appPath + "tokens/";
-    final String googleCreds = "googleCredentialsPath=" + appPath + "credentials.json";
-    final String downloadPath = "downloadPath=" + appPath + "drive/";
-    final String defP1 = String.format("'%svideopanel.playlist'", appPath);
-    final String defP2 = String.format("'%sleftpanel.playlist'", appPath);
-    final String defP3 = String.format("'%srightpanel.playlist'", appPath);
+    final String tokenStorage = "tokenStoragePath=" + cachePath + "tokens/";
+    final String googleCreds = "googleCredentialsPath=" + configPath + "credentials.json";
+    final String downloadPath = "downloadPath=" + cachePath + "drive/";
+    final String defP1 = String.format("'%svideopanel.playlist'", configPath);
+    final String defP2 = String.format("'%sleftpanel.playlist'", configPath);
+    final String defP3 = String.format("'%srightpanel.playlist'", configPath);
     final String playlists = String.format("playlists=%s, %s, %s", defP1, defP2, defP3);
     List<String> properties = List.of(
         tokenStorage,
