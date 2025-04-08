@@ -64,6 +64,10 @@ public class Config {
         System.out.println("[DEBUG] NO local properties found");
       }
 
+      File configFolder = new File(configPath);                                                                                                                                                            
+      if (!configFolder.exists())
+        if (!configFolder.mkdirs()) System.out.println("[ERROR] FAILED TO FIND OR CREATE APP'S CONFIG FOLDER."); 
+
       if (!propsLoaded) {
         File propertyFile = new File(configPath + "config");
         if (!propertyFile.exists()) {
