@@ -1,13 +1,13 @@
 package com.kusa;
 
-import java.util.Properties;
 import java.io.File;
-import java.io.IOException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Class for managing the applications configuration.
@@ -27,10 +27,14 @@ import java.util.Arrays;
  *  maybe we can have some sort of specification of playlist inside the config file?
  */
 public class Config {
+
   // this is platform specific. it should work fine on unix
-  private static final String appPath = System.getProperty("user.home") + "/.jinzo/";
-  private static final String cachePath = System.getProperty("user.home") + "/.cache/jinzo/";
-  private static final String configPath = System.getProperty("user.home") + "/.config/jinzo/";
+  private static final String appPath =
+    System.getProperty("user.home") + "/.jinzo/";
+  private static final String cachePath =
+    System.getProperty("user.home") + "/.cache/jinzo/";
+  private static final String configPath =
+    System.getProperty("user.home") + "/.config/jinzo/";
   private static Properties props;
 
   /**
@@ -64,9 +68,12 @@ public class Config {
         System.out.println("[DEBUG] NO local properties found");
       }
 
-      File configFolder = new File(configPath);                                                                                                                                                            
-      if (!configFolder.exists())
-        if (!configFolder.mkdirs()) System.out.println("[ERROR] FAILED TO FIND OR CREATE APP'S CONFIG FOLDER."); 
+      File configFolder = new File(configPath);
+      if (!configFolder.exists()) if (
+        !configFolder.mkdirs()
+      ) System.out.println(
+        "[ERROR] FAILED TO FIND OR CREATE APP'S CONFIG FOLDER."
+      );
 
       if (!propsLoaded) {
         File propertyFile = new File(configPath + "config");
@@ -77,50 +84,62 @@ public class Config {
         }
         props.load(new FileReader(propertyFile));
         System.out.printf(
-            "[SUCSSES] %s loaded\n", propertyFile.getAbsolutePath());
+          "[SUCSSES] %s loaded\n",
+          propertyFile.getAbsolutePath()
+        );
       }
 
-      System.out.println("[DEBUG] Google credentials found at:" + getProperty("googleCredentialsPath"));
-      System.out.println("[DEBUG] Reading tokens from:" + getProperty("tokenStoragePath"));
-      System.out.println("[DEBUG] Saving drive downloads to:" + getProperty("downloadPath"));
+      System.out.println(
+        "[DEBUG] Google credentials found at:" +
+        getProperty("googleCredentialsPath")
+      );
+      System.out.println(
+        "[DEBUG] Reading tokens from:" + getProperty("tokenStoragePath")
+      );
+      System.out.println(
+        "[DEBUG] Saving drive downloads to:" + getProperty("downloadPath")
+      );
 
       File driveFolder = new File(getProperty("downloadPath"));
-      if (!driveFolder.exists())
-        if (!driveFolder.mkdirs()) System.out.println("FAILED TO FIND OR CREATE DRIVE FOLDER.");
+      if (!driveFolder.exists()) if (!driveFolder.mkdirs()) System.out.println(
+        "FAILED TO FIND OR CREATE DRIVE FOLDER."
+      );
 
       File tokenFolder = new File(getProperty("tokenStoragePath"));
-      if (!tokenFolder.exists())
-        if (!tokenFolder.mkdirs()) System.out.println("FAILED TO FIND OR CREATE TOKEN FOLDER.");
+      if (!tokenFolder.exists()) if (!tokenFolder.mkdirs()) System.out.println(
+        "FAILED TO FIND OR CREATE TOKEN FOLDER."
+      );
 
       File appCreds = new File(props.getProperty("googleCredentialsPath"));
       if (!appCreds.exists()) {
         System.out.println(
-            "WARNING!!! NO APP CREDENTIALS FOUND: "
-                + props.getProperty("googleCredentialsPath")
-                + " (DRIVE SERVICES WILL NOT WORK)!");
+          "WARNING!!! NO APP CREDENTIALS FOUND: " +
+          props.getProperty("googleCredentialsPath") +
+          " (DRIVE SERVICES WILL NOT WORK)!"
+        );
       }
 
       String full = props.getProperty("playlists");
       String[] playlistFileNames = full.split(",");
-      if(playlistFileNames.length > 0)
-        System.out.printf("[DEBUG] Found %d playlists.\n", playlistFileNames.length);
-      else
-        System.out.printf("[ERROR] NO PLAYLIST FILES FOUND!\n");
+      if (playlistFileNames.length > 0) System.out.printf(
+        "[DEBUG] Found %d playlists.\n",
+        playlistFileNames.length
+      );
+      else System.out.printf("[ERROR] NO PLAYLIST FILES FOUND!\n");
 
-      for (String name : playlistFileNames)
-      {
+      for (String name : playlistFileNames) {
         final String playlistPath = name.replace("'", "").trim();
         File playlistFile = new File(playlistPath);
-        if (!playlistFile.exists())
-        {
-          if (!playlistFile.createNewFile())
-            System.out.println("Failed to find or create playlist " + playlistPath);
-          else
-            writeDefaultPlaylist(playlistFile);
+        if (!playlistFile.exists()) {
+          if (!playlistFile.createNewFile()) System.out.println(
+            "Failed to find or create playlist " + playlistPath
+          );
+          else {
+            if (name.contains("video")) writeDefaultPlaylist(playlistFile, 0);
+            else writeDefaultPlaylist(playlistFile, 1);
+          }
         }
       }
-
-
     } catch (Exception e) {
       System.out.println("STARTUP FAILED!" + e);
       System.out.println(e.getMessage());
@@ -146,14 +165,16 @@ public class Config {
    * Returns array of all the loaded playlist files.
    *
    */
-  public static String[] playlistFiles()
-  {
-    if(props == null || props.getProperty("playlists") == null)
-      return new String[0];
+  public static String[] playlistFiles() {
+    if (
+      props == null || props.getProperty("playlists") == null
+    ) return new String[0];
 
     String full = props.getProperty("playlists");
     String[] playlistFileNames = full.split(",");
-    return Arrays.stream(playlistFileNames).map(fileName -> fileName.replace("'", "").trim()).toArray(String[]::new);
+    return Arrays.stream(playlistFileNames)
+      .map(fileName -> fileName.replace("'", "").trim())
+      .toArray(String[]::new);
   }
 
   /*
@@ -172,17 +193,32 @@ public class Config {
    */
   private static void writeDefaultAppProperties(File file) throws IOException {
     final String tokenStorage = "tokenStoragePath=" + cachePath + "tokens/";
-    final String googleCreds = "googleCredentialsPath=" + configPath + "credentials.json";
+    final String googleCreds =
+      "googleCredentialsPath=" + configPath + "credentials.json";
     final String downloadPath = "downloadPath=" + cachePath + "drive/";
-    final String defP1 = String.format("'%svideopanel.playlist'", configPath);
-    final String defP2 = String.format("'%sleftpanel.playlist'", configPath);
-    final String defP3 = String.format("'%srightpanel.playlist'", configPath);
-    final String playlists = String.format("playlists=%s, %s, %s", defP1, defP2, defP3);
+    final String defP1 = String.format(
+      "'%splaylists/videopanel.playlist'",
+      configPath
+    );
+    final String defP2 = String.format(
+      "'%splaylists/leftpanel.playlist'",
+      configPath
+    );
+    final String defP3 = String.format(
+      "'%splaylists/rightpanel.playlist'",
+      configPath
+    );
+    final String playlists = String.format(
+      "playlists=%s, %s, %s",
+      defP1,
+      defP2,
+      defP3
+    );
     List<String> properties = List.of(
-        tokenStorage,
-        googleCreds,
-        downloadPath,
-        playlists
+      tokenStorage,
+      googleCreds,
+      downloadPath,
+      playlists
     );
     try {
       Files.write(Paths.get(file.getAbsolutePath()), properties);
@@ -191,19 +227,34 @@ public class Config {
     }
   }
 
-  private static void writeDefaultPlaylist(File file) {
+  //defId
+  //0 = default to all videos
+  //1 = default to all photos
+  private static void writeDefaultPlaylist(File file, int defId) {
+    String include = "";
+    switch (defId) {
+      case 0:
+        include = "$videos";
+        break;
+      case 1:
+        include = "$photos";
+        break;
+      default:
+        include = "";
+        break;
+    }
     List<String> sections = List.of(
-        "[videos]",
-        System.getProperty("user.home") + "/Videos/*",
-        "[photos]",
-        System.getProperty("user.home") + "/Photos/*",
-        "[monday]",
-        "[tuesday]",
-        "[wednesday]",
-        "[thursday]",
-        "[friday]",
-        "[saturday]",
-        "[sunday]"
+      "[videos]",
+      System.getProperty("user.home") + "/Videos/*",
+      "[photos]",
+      System.getProperty("user.home") + "/Photos/*",
+      String.format("[monday]\n%s", include),
+      String.format("[tuesday]\n%s", include),
+      String.format("[wednesday]\n%s", include),
+      String.format("[thursday]\n%s", include),
+      String.format("[friday]\n%s", include),
+      String.format("[saturday]\n%s", include),
+      String.format("[sunday]\n%s", include)
     );
     try {
       Files.write(Paths.get(file.getAbsolutePath()), sections);
