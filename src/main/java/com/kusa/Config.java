@@ -241,20 +241,25 @@ public class Config {
     String include = "";
     switch (defId) {
       case 0:
-        include = "$videos";
+        include = String.format("$local-videos\n$drive-videos");
         break;
       case 1:
-        include = "$photos";
+        include = String.format("$local-photos\n$drive-photos");
         break;
       default:
         include = "";
         break;
     }
     List<String> sections = List.of(
-      "[videos]",
+      "[local-videos]",
       System.getProperty("user.home") + "/Videos/*",
-      "[photos]",
+      "[drive-videos]"
+      cachePath + "drive/videos/*",
+      "[local-photos]",
       System.getProperty("user.home") + "/Photos/*",
+      "[drive-photos]",
+      cachePath + "drive/photos/*",
+      "",
       String.format("[monday]\n%s", include),
       String.format("[tuesday]\n%s", include),
       String.format("[wednesday]\n%s", include),
