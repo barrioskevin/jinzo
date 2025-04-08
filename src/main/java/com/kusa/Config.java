@@ -78,6 +78,12 @@ public class Config {
       ) System.out.println(
         "[ERROR] FAILED TO FIND OR CREATE APP'S CONFIG FOLDER."
       );
+      File playlistsFolder = new File(configPath+"playlists");
+      if (!playlistsFolder.exists()) if (
+        !playlistsFolder.mkdirs()
+      ) System.out.println(
+        "[ERROR] FAILED TO FIND OR CREATE APP'S PLAYLISTS FOLDER."
+      );
 
       if (!propsLoaded) {
         File propertyFile = new File(configPath + "config");
@@ -126,7 +132,7 @@ public class Config {
       String full = props.getProperty("playlists");
       String[] playlistFileNames = full.split(",");
       if (playlistFileNames.length > 0) System.out.printf(
-        "[DEBUG] Found %d playlists.\n",
+        "[DEBUG] Found %d playlists to load.\n",
         playlistFileNames.length
       );
       else System.out.printf("[ERROR] NO PLAYLIST FILES FOUND!\n");
