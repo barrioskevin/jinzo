@@ -12,45 +12,49 @@ import java.util.Properties;
 /**
  * Class for managing the applications configuration.
  *
- * <p>an attempt to manage the internal directories seamlessly
+ * <p> An attempt to manage the internal directories seamlessly. 
  *
- * <p>appPath - where the app will "install" currently platform specific might not work on windows.
+ * <p>.cache/jinzo/ - where the app will place google drive downloads by default.
+ *                        auth tokens are also stored here.
+ *
+ * <p>.config/jinzo/ - where the app will place configuration file by default.
+ *                        ".playlist" files are also stored here.
  *
  * -- roadmap ---
  *  I need to make sure that the properites file loaded includes all the needed properites.
  *
  *    Service related hm...
  *    # token storage path - (if using google drive api)
+ *      - (.cache/jinzo/tokens/)
  *    # app credentials.json - (if using google drive api)
+ *      - (.config/jinzo/credentials.json)
  *    # local map of google drive path - (where downloaded drive files go)
- *
- *  maybe we can have some sort of specification of playlist inside the config file?
+ *      - (.cache/jinzo/drive/)
  */
 public class Config {
 
-  // this is platform specific. it should work fine on unix
-  private static final String appPath =
-    System.getProperty("user.home") + "/.jinzo/";
+  // this is platform specific. it should work fine on unix-like systems.
   private static final String cachePath =
     System.getProperty("user.home") + "/.cache/jinzo/";
   private static final String configPath =
     System.getProperty("user.home") + "/.config/jinzo/";
   private static Properties props;
 
-  /**
-   * Hidden "Start Up".
+  /*
+   * This method will fire at an early stage of programs execution.
    *
-   * <p>this method will fire at the start of programs execution.
-   *
-   * <p>we try to load in the application properties as well as verify that all needed directories
+   * we try to load in the application properties as well as verify that all needed directories
    * exist.
    *
-   * <p>we check for a relative application.properties first meaning if one exists in the
-   * src/main/resources folder it will be used. However, the main appPath will still be created!
+   * the app first attempts to read a config from the classpath,
+   *   this is for development purposes (and i should probably remove).
    *
-   * <p>if any exceptions occur when trying to read or create files/directories that app will crash!
+   * when it doesn't find anything in cp the app looks for a config file in /.config/jinzo/
    *
-   * <p>if certain properties for services are not found a warning should appear with steps on how
+   * if any exceptions occur when trying to read or create files/directories the app should crash.
+   *
+   * ---features---
+   * if certain properties for services are not found a warning should appear with steps on how
    * to resolve it, and what service cannot be used.
    */
   static {
@@ -102,18 +106,18 @@ public class Config {
 
       File driveFolder = new File(getProperty("downloadPath"));
       if (!driveFolder.exists()) if (!driveFolder.mkdirs()) System.out.println(
-        "FAILED TO FIND OR CREATE DRIVE FOLDER."
+        "[ERROR] FAILED TO FIND OR CREATE DRIVE FOLDER."
       );
 
       File tokenFolder = new File(getProperty("tokenStoragePath"));
       if (!tokenFolder.exists()) if (!tokenFolder.mkdirs()) System.out.println(
-        "FAILED TO FIND OR CREATE TOKEN FOLDER."
+        "[ERROR] FAILED TO FIND OR CREATE TOKEN FOLDER."
       );
 
       File appCreds = new File(props.getProperty("googleCredentialsPath"));
       if (!appCreds.exists()) {
         System.out.println(
-          "WARNING!!! NO APP CREDENTIALS FOUND: " +
+          "[WARNING] NO APP CREDENTIALS.json FOUND: " +
           props.getProperty("googleCredentialsPath") +
           " (DRIVE SERVICES WILL NOT WORK)!"
         );
@@ -132,7 +136,7 @@ public class Config {
         File playlistFile = new File(playlistPath);
         if (!playlistFile.exists()) {
           if (!playlistFile.createNewFile()) System.out.println(
-            "Failed to find or create playlist " + playlistPath
+            "[ERROR] Failed to find or create playlist " + playlistPath
           );
           else {
             if (name.contains("video")) writeDefaultPlaylist(playlistFile, 0);
@@ -141,7 +145,7 @@ public class Config {
         }
       }
     } catch (Exception e) {
-      System.out.println("STARTUP FAILED!" + e);
+      System.out.println("[ERROR] STARTUP FAILED!" + e);
       System.out.println(e.getMessage());
       e.printStackTrace();
       System.exit(1);
@@ -151,11 +155,18 @@ public class Config {
   /**
    * Returns the value of the property given the property name.
    *
-   * <p>currently the app only has 3 valid properties - tokenStoragePath - googleCredentialsPath -
-   * downloadPath
+   * <p>currently the app only has 4 valid properties 
+   *  - tokenStoragePath 
+   *  - googleCredentialsPath
+   *  - downloadPath
+   *  - playlists 
    *
-   * <p>if the amount of properties remains small we can consider making them all getters instead of
-   * a generic get property.
+   * <p> these properties are mostly related to google drive and that class
+   *      already handles getting the properties it needs.
+   *
+   * <p> if you want to get a list of the playlist files you playlistFiles()
+   *      instead. if you call getProperty("playlists") you will get a single string,
+   *      that needs further processing to identify each playlist.
    */
   public static String getProperty(String propName) {
     return ((props == null) ? "" : props.getProperty(propName));
@@ -164,6 +175,10 @@ public class Config {
   /**
    * Returns array of all the loaded playlist files.
    *
+   * the files are on the system 
+   * (/home/user/.config/jinzo/playlists/)
+   *
+   * @return string array of all playlist file's absolute paths.
    */
   public static String[] playlistFiles() {
     if (
@@ -177,16 +192,8 @@ public class Config {
       .toArray(String[]::new);
   }
 
-  /*
-   * When the app is first installing it will look for appliaction.properties in the
-   * class path. if its not found it will look in our main install folder .jinzo/
-   * if its not found there the app will attempt to create it and fill it with the
-   * default properties specified below.
-   *
-   * ./jinzo
-   *  - /drive/ <- main media folder.
-   *  - /tokens/ <- drive users access tokens.
-   *  - credentials.json <- client credentials needed to connect to google services.
+  /* 
+   * writing the default config file when none is found. (usually on first install)
    *
    * credentials.json can NOT be created for you. it will only define the property
    * with the value of it's default location.
