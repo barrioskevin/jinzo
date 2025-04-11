@@ -5,6 +5,7 @@ import com.kusa.jobs.UpdateSidePanel;
 import com.kusa.player.AppFrame;
 import com.kusa.player.SidePanel;
 import com.kusa.player.VideoListPanel;
+import com.kusa.player.SingleVideoPanel;
 import com.kusa.player.VideoPanel;
 import com.kusa.playlist.CircularQueuePlaylist;
 import com.kusa.playlist.Playlist;
@@ -65,20 +66,20 @@ public class VlcjApp {
     executor.scheduleAtFixedRate(
       new DownloadFromDrive(gds, 12, 8),
       0L,
-      3L,
-      TimeUnit.MINUTES
+      15L,
+      TimeUnit.MINUTES //download from drive every 15 min
     );
     executor.scheduleAtFixedRate(
       new UpdateSidePanel(left, leftPanelPlaylist, true),
       0L,
       5L,
-      TimeUnit.MINUTES
+      TimeUnit.MINUTES //(call next) every 5 minutes
     );
     executor.scheduleAtFixedRate(
       new UpdateSidePanel(right, rightPanelPlaylist, false),
       0L,
       5L,
-      TimeUnit.MINUTES
+      TimeUnit.MINUTES //(call next) every 5 minutes
     );
 
     //create engagement frame + add shutdown.
