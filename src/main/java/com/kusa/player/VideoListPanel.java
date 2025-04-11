@@ -87,15 +87,19 @@ public class VideoListPanel
   @Override
   public void mediaListPlayerFinished(MediaListPlayer mlp) {
     playlist.clear();
-    mediaListPlayer().submit(() -> mediaListPlayer().list().media().clear());
+    //mediaListPlayer().submit(() -> mediaListPlayer().list().media().clear());
+    mediaListPlayer().list().media().clear();
     for (String video : VideoPanel.videoMRLS()) playlist.add(video);
 
     playlist.shuffle();
+    /*
     for (String video : playlist.trackList()) mediaListPlayer()
       .submit(() -> mediaListPlayer().list().media().add(video));
+    */
+    for (String video : playlist.trackList())
+      mediaListPlayer().list().media().add(video);
 
     mediaListPlayer().submit(() -> mediaListPlayer().controls().play(0));
-
     log(String.format("Starting new playlist of %s videos.", playlist.size()));
   }
 
