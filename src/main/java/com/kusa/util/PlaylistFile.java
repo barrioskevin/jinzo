@@ -10,8 +10,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -138,20 +141,26 @@ public class PlaylistFile {
   private List<String> resolvePlaylistContent(String content) {
     String[] parts = content.split("/");
     if (parts[parts.length - 1].equals("*")) {
-      String folder = content.substring(0, content.length() - 2);
+      boolean recursive =
+        parts.length >= 3 &&
+        parts[parts.length - 2].equals("*") &&
+        !parts[parts.length - 3].equals("*");
+      String first = recursive
+        ? content.substring(0, content.length() - 3)
+        : content.substring(0, content.length() - 2);
+      Queue<File> folders = new LinkedList<>(List.of(new File(first)));
       List<String> nestedContent = new ArrayList<>();
-
-      if (!LocalService.checkDir(folder)) return Collections.emptyList();
-
-      File folderFile = new File(folder);
-      File[] files = folderFile.listFiles();
-      for (File file : files) {
-        if (!file.isDirectory()) nestedContent.add(file.getAbsolutePath());
+      while (!folders.isEmpty()) {
+        File dir = folders.poll();
+        if (!dir.exists()) continue;
+        File[] files = dir.listFiles();
+        for (File file : files) {
+          if (file.isDirectory() && recursive) folders.add(file);
+          if (!file.isDirectory()) nestedContent.add(file.getAbsolutePath());
+        }
       }
       return nestedContent;
-    }
-
-    if (LocalService.fileExists(content)) return List.of(content);
+    } else if (LocalService.fileExists(content)) return List.of(content);
     else return Collections.emptyList();
   }
 
