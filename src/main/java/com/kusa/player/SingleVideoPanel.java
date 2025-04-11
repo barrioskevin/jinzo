@@ -68,7 +68,13 @@ public class SingleVideoPanel
     );
   }
 
-  //will make a call to scale the video to fit fully in container.
+  /**
+   * Overriding playing event in media player.
+   *
+   * this will get triggered when a video starts to play.
+   *
+   * will make a call to scale the video to fit fully in container.
+   */
   @Override
   public void playing(MediaPlayer mp) {
     mp
@@ -89,10 +95,9 @@ public class SingleVideoPanel
    */
   @Override
   public void finished(MediaPlayer mp) {
-    if (playlist.isEmpty()) log("WARNING the video panel playlist is empty!!!");
+    if (playlist.isEmpty()) log("[WARNING] Video panel playlist is empty!!!");
 
     log("a video just finished.");
-    Set<String> driveMrls = new HashSet<>();
 
     boolean willShuffle = false;
     if (playlist.index() == 0) {
