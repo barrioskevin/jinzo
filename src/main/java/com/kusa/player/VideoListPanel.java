@@ -96,8 +96,10 @@ public class VideoListPanel
     for (String video : playlist.trackList()) mediaListPlayer()
       .submit(() -> mediaListPlayer().list().media().add(video));
     */
-    for (String video : playlist.trackList())
-      mediaListPlayer().list().media().add(video);
+    for (String video : playlist.trackList()) mediaListPlayer()
+      .list()
+      .media()
+      .add(video);
 
     mediaListPlayer().submit(() -> mediaListPlayer().controls().play(0));
     log(String.format("Starting new playlist of %s videos.", playlist.size()));

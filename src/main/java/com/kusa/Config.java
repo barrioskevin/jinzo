@@ -12,7 +12,7 @@ import java.util.Properties;
 /**
  * Class for managing the applications configuration.
  *
- * <p> An attempt to manage the internal directories seamlessly. 
+ * <p> An attempt to manage the internal directories seamlessly.
  *
  * <p>.cache/jinzo/ - where the app will place google drive downloads by default.
  *                        auth tokens are also stored here.
@@ -78,7 +78,7 @@ public class Config {
       ) System.out.println(
         "[ERROR] FAILED TO FIND OR CREATE APP'S CONFIG FOLDER."
       );
-      File playlistsFolder = new File(configPath+"playlists");
+      File playlistsFolder = new File(configPath + "playlists");
       if (!playlistsFolder.exists()) if (
         !playlistsFolder.mkdirs()
       ) System.out.println(
@@ -161,11 +161,11 @@ public class Config {
   /**
    * Returns the value of the property given the property name.
    *
-   * <p>currently the app only has 4 valid properties 
-   *  - tokenStoragePath 
+   * <p>currently the app only has 4 valid properties
+   *  - tokenStoragePath
    *  - googleCredentialsPath
    *  - downloadPath
-   *  - playlists 
+   *  - playlists
    *
    * <p> these properties are mostly related to google drive and that class
    *      already handles getting the properties it needs.
@@ -181,7 +181,7 @@ public class Config {
   /**
    * Returns array of all the loaded playlist files.
    *
-   * the files are on the system 
+   * the files are on the system
    * (/home/user/.config/jinzo/playlists/)
    *
    * @return string array of all playlist file's absolute paths.
@@ -198,7 +198,7 @@ public class Config {
       .toArray(String[]::new);
   }
 
-  /* 
+  /*
    * writing the default config file when none is found. (usually on first install)
    *
    * credentials.json can NOT be created for you. it will only define the property
