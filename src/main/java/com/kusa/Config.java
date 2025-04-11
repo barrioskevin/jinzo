@@ -258,13 +258,13 @@ public class Config {
     }
     List<String> sections = List.of(
       "[local-videos]",
-      System.getProperty("user.home") + "/Videos/*",
+      System.getProperty("user.home") + "/Videos/**",
       "[drive-videos]",
-      cachePath + "drive/videos/*",
+      cachePath + "drive/videos/**",
       "[local-photos]",
-      System.getProperty("user.home") + "/Photos/*",
+      System.getProperty("user.home") + "/Photos/**",
       "[drive-photos]",
-      cachePath + "drive/photos/*",
+      cachePath + "drive/photos/**",
       "",
       String.format("[monday]\n%s", include),
       String.format("[tuesday]\n%s", include),

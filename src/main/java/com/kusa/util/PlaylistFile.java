@@ -140,11 +140,12 @@ public class PlaylistFile {
   //could be a single file, a folder of files, ...
   private List<String> resolvePlaylistContent(String content) {
     String[] parts = content.split("/");
-    if (parts[parts.length - 1].equals("*")) {
-      boolean recursive =
-        parts.length >= 3 &&
-        parts[parts.length - 2].equals("*") &&
-        !parts[parts.length - 3].equals("*");
+    if (parts[parts.length - 1].contains("*")) {
+      String stars = parts[parts.length - 1];
+      boolean recursive = stars.equals("**");
+      if (
+        stars.length() != 1 && stars.length() != 2
+      ) return Collections.emptyList();
       String first = recursive
         ? content.substring(0, content.length() - 3)
         : content.substring(0, content.length() - 2);
