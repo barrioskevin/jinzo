@@ -86,7 +86,7 @@ public class VideoListPanel
    */
   @Override
   public void finished(MediaPlayer mp) {
-    if(playlist.index() != playlist.size() - 1) return;
+    if (playlist.index() != playlist.size()) return;
     playlist.clear();
     //mediaListPlayer().submit(() -> mediaListPlayer().list().media().clear());
     mediaListPlayer().list().media().clear();
@@ -147,6 +147,7 @@ public class VideoListPanel
   public void stop() {
     mediaListPlayer().submit(() -> mediaListPlayer().controls().stop());
   }
+
   //pauses the player.
   @Override
   public void pause() {
@@ -162,7 +163,6 @@ public class VideoListPanel
   public boolean isPlaying() {
     return mediaListPlayer().status().isPlaying();
   }
-
 
   @Override
   public JPanel panel() {

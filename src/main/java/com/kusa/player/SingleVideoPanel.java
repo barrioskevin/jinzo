@@ -149,8 +149,7 @@ public class SingleVideoPanel
   }
 
   @Override
-  public void error(MediaPlayer mp)
-  {
+  public void error(MediaPlayer mp) {
     log("an error occured!!!");
   }
 
