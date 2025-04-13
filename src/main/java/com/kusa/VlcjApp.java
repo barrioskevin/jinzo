@@ -29,6 +29,7 @@ import javax.swing.SwingUtilities;
 public class VlcjApp {
 
   private static VideoPanel middle;
+  public static boolean running;
 
   public static void exec(GDriveService gds) {
     //screen dimensions
@@ -91,6 +92,7 @@ public class VlcjApp {
         @Override
         public void keyPressed(KeyEvent e) {
           if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            running = false;
             executor.shutdownNow();
             SwingUtilities.invokeLater(() ->
               engagementFrame.dispatchEvent(
@@ -106,18 +108,17 @@ public class VlcjApp {
     //set fullscreen and play the video panel
     engagementFrame.fullscreen();
     middle.start();
+    running = true;
   }
 
-  public static void start()
-  {
-    if(middle == null) return;
-    if(middle.isPlaying()) return;
+  public static void start() {
+    if (middle == null) return;
+    if (middle.isPlaying()) return;
     middle.start();
   }
 
-  public static void pause()
-  {
-    if(middle == null) return;
+  public static void pause() {
+    if (middle == null) return;
     middle.pause();
   }
 }
