@@ -28,6 +28,8 @@ import javax.swing.SwingUtilities;
  */
 public class VlcjApp {
 
+  private static VideoPanel middle;
+
   public static void exec(GDriveService gds) {
     //screen dimensions
     final int screenWidth = AppFrame.device.getDisplayMode().getWidth();
@@ -60,7 +62,7 @@ public class VlcjApp {
       screenWidth / 3,
       screenHeight
     );
-    VideoPanel middle = new VideoListPanel(videoPlaylist, gds);
+    middle = new SingleVideoPanel(videoPlaylist, gds);
 
     //schedule tasks.
     executor.scheduleAtFixedRate(
@@ -104,5 +106,18 @@ public class VlcjApp {
     //set fullscreen and play the video panel
     engagementFrame.fullscreen();
     middle.start();
+  }
+
+  public static void start()
+  {
+    if(middle == null) return;
+    if(middle.isPlaying()) return;
+    middle.start();
+  }
+
+  public static void pause()
+  {
+    if(middle == null) return;
+    middle.pause();
   }
 }
