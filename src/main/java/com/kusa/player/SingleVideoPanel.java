@@ -149,13 +149,29 @@ public class SingleVideoPanel
   }
 
   @Override
+  public void error(MediaPlayer mp)
+  {
+    log("an error occured!!!");
+  }
+
+  @Override
   /**
-   * sends a stop signal to player using submit.
+   * sends a stop signal to player.
    *
    * should stop the video.
    */
   public void stop() {
-    mediaPlayer().submit(() -> mediaPlayer().controls().stop());
+    mediaPlayer().controls().stop();
+  }
+
+  /**
+   * sends a pause signal to player using submit.
+   *
+   * should pause the video.
+   */
+  @Override
+  public void pause() {
+    mediaPlayer().controls().pause();
   }
 
   @Override
@@ -166,6 +182,11 @@ public class SingleVideoPanel
   @Override
   public void shutdown() {
     this.release();
+  }
+
+  @Override
+  public boolean isPlaying() {
+    return mediaPlayer().status().isPlaying();
   }
 
   private void log(String message) {

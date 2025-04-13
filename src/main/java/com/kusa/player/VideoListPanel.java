@@ -85,7 +85,8 @@ public class VideoListPanel
    * call play on first index.
    */
   @Override
-  public void mediaListPlayerFinished(MediaListPlayer mlp) {
+  public void finished(MediaPlayer mp) {
+    if(playlist.index() != playlist.size() - 1) return;
     playlist.clear();
     //mediaListPlayer().submit(() -> mediaListPlayer().list().media().clear());
     mediaListPlayer().list().media().clear();
@@ -146,11 +147,22 @@ public class VideoListPanel
   public void stop() {
     mediaListPlayer().submit(() -> mediaListPlayer().controls().stop());
   }
+  //pauses the player.
+  @Override
+  public void pause() {
+    mediaListPlayer().submit(() -> mediaListPlayer().controls().pause());
+  }
 
   @Override
   public void shutdown() {
     this.release();
   }
+
+  @Override
+  public boolean isPlaying() {
+    return mediaListPlayer().status().isPlaying();
+  }
+
 
   @Override
   public JPanel panel() {

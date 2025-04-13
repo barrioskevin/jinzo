@@ -80,6 +80,8 @@ public interface VideoPanel {
 
   void start();
   void stop();
+  void pause();
   void shutdown();
+  boolean isPlaying();
   JPanel panel();
 }
