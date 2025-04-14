@@ -230,7 +230,7 @@ public class JinzoApp {
 
   public int currentVideoIndex() {
     if (!running) return -1;
-    if (videoPlaylist.index() == 0) return 0;
+    if (videoPlaylist.index() == 0) return videoPlaylist.size() - 1;
     return videoPlaylist.index() - 1;
   }
 
