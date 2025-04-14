@@ -17,9 +17,11 @@ public class CircularQueuePlaylist implements Playlist {
   List<String> mrls;
   Set<String> mrlSet;
   private int index;
+  private String currentTrack;
 
   public CircularQueuePlaylist() {
     this(new ArrayList<String>());
+    currentTrack = "Nothing. (empty)";
   }
 
   /**
@@ -31,6 +33,7 @@ public class CircularQueuePlaylist implements Playlist {
     mrls = new ArrayList<>(initialMRLS);
     mrlSet = new HashSet<>(mrls);
     index = 0;
+    if (mrls.size() > 0) currentTrack = mrls.get(0);
   }
 
   @Override
@@ -41,6 +44,7 @@ public class CircularQueuePlaylist implements Playlist {
     mrls.clear();
     mrlSet.clear();
     index = 0;
+    currentTrack = "Nothing. (empty)";
     return true;
   }
 
@@ -132,6 +136,7 @@ public class CircularQueuePlaylist implements Playlist {
       remove(next);
       return next(); // TODO LOOOK OUT RIGHT HERE COULD BE TROUBLE!!!
     }
+    currentTrack = next;
     return next;
   }
 
@@ -156,21 +161,13 @@ public class CircularQueuePlaylist implements Playlist {
   /**
    * Gets the MRL of current media playing.
    *
-   * returns empty string if playlist empty.
-   *
-   * be careful calling this right after next, it will
-   * be two different mrls.
-   *
-   * broken
+   * returns 'Nothing. (empty)' if playlist empty.
    *
    * @return String of MRL at index of playlist.
    */
   @Override
   public String current() {
-    if (
-      size() > 0 && index < size() && mrls.get(index) != null
-    ) return mrls.get(index);
-    return "";
+    return currentTrack;
   }
 
   /**
