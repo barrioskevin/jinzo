@@ -16,6 +16,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -205,11 +207,60 @@ public class JinzoApp {
     }
   }
 
+  /**
+   * pauses the player's playback.
+   */
   public void pause() {
     if (!running) return;
 
     //video panel implementation takes care of pause logic
     middle.pause();
+  }
+
+  /**
+   * Returns the current video playing/loaded
+   * according to the video playlist.
+   *
+   * @return current media from playlist or empty.
+   */
+  public String currentVideoPanelMedia() {
+    if (!running) return "";
+    return videoPlaylist.current();
+  }
+
+  public int currentVideoIndex() {
+    if (!running) return -1;
+    if (videoPlaylist.index() == 0) return 0;
+    return videoPlaylist.index() - 1;
+  }
+
+  /**
+   * If the player is running this will return the tracklist
+   * that is loaded into 'videoPlaylist'.
+   *
+   * @return video playlist's tracklist or empty.
+   */
+  public List<String> videoTrackList() {
+    if (!running) return Collections.emptyList();
+    return videoPlaylist.trackList();
+  }
+
+  /**
+   * Returns the current image on the left panel.
+   * @return string representing mrl of left panel's image or empty.
+   */
+  public String currentLeftPanelMedia() {
+    if (!running) return "";
+    return leftPanelPlaylist.current();
+  }
+
+  /**
+   * Returns the current image on the right panel.
+   * @return string representing mrl of right panel's image or empty.
+   */
+  public String currentRightPanelMedia() {
+    if (!running) return "";
+    return rightPanelPlaylist.current();
   }
 
   /**
