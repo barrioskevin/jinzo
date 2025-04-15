@@ -46,6 +46,7 @@ public class SingleVideoPanel
     gds = gds_;
 
     setOpaque(true); //maybe remove?
+    setCursorEnabled(false); //kind of works. (ONLY OVER VID PANEL)
   }
 
   /**
