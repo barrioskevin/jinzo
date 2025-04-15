@@ -63,6 +63,8 @@ public class CircularQueuePlaylist implements Playlist {
 
     mrls.add(mrl);
     mrlSet.add(mrl);
+    if(currentTrack.equals("Nothing. (empty)"))
+      currentTrack = mrls.get(0);
     return true;
   }
 
@@ -155,7 +157,8 @@ public class CircularQueuePlaylist implements Playlist {
     if (mrls.isEmpty()) return "";
 
     index = pIndex % mrls.size();
-    return mrls.get(index++);
+    currentTrack = mrls.get(index++);
+    return currentTrack;
   }
 
   /**
