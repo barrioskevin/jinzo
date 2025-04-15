@@ -1,5 +1,6 @@
 package com.kusa.util;
 
+import com.kusa.playlist.ScalaPlaylistFactory;
 import com.kusa.playlist.CircularQueuePlaylist;
 import com.kusa.playlist.Playlist;
 import com.kusa.service.LocalService;
@@ -134,7 +135,7 @@ public class PlaylistFile {
     }
     */
 
-    return new CircularQueuePlaylist(latestPlaylistContents);
+    return ScalaPlaylistFactory.foreverPlaylist(latestPlaylistContents);
   }
 
   //could be a single file, a folder of files, ...
