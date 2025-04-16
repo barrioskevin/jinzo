@@ -61,7 +61,11 @@ public class SingleVideoPanel
     final String track = playlist.trackAt(playlistIndex);
     mediaPlayer().media().play(track);
     log(
-      String.format("Starting video panel.\n [index]:%d\n [vid]:%s", playlistIndex, track)
+      String.format(
+        "Starting video panel.\n [index]:%d\n [vid]:%s",
+        playlistIndex,
+        track
+      )
     );
   }
 
@@ -74,7 +78,13 @@ public class SingleVideoPanel
    */
   @Override
   public void playing(MediaPlayer mp) {
-    log(String.format("Now playing:\n [index]%d\n [vid]:%s", playlistIndex, playlist.trackAt(playlistIndex)));
+    log(
+      String.format(
+        "Now playing:\n [index]%d\n [vid]:%s",
+        playlistIndex,
+        playlist.trackAt(playlistIndex)
+      )
+    );
     mp
       .video()
       .setScale(VideoPanel.calcScale(mp.video().videoDimension(), getSize()));
@@ -97,15 +107,16 @@ public class SingleVideoPanel
     log("a video just finished.");
 
     //advance index and see if we are at end.
-    if(playlistIndex++ == playlist.size())
-    {
+    if (++playlistIndex == playlist.size()) {
       log("playlist ended! reloading playlist...");
       playlistFile.reload();
       playlist = Playlist.dailyPlaylist(playlistFile);
       playlist.shuffle();
       playlistIndex = 0;
 
-      log(String.format("new playlist loaded with %d tracks.", playlist.size()));
+      log(
+        String.format("new playlist loaded with %d tracks.", playlist.size())
+      );
       List<String> tracks = playlist.trackList();
       for (int i = 0; i < tracks.size(); i++) log(
         String.format(" [%d] : %s", i, tracks.get(i))
