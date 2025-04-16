@@ -4,6 +4,6 @@ import scala.collection.mutable.ArrayBuffer
 import scala.collection.JavaConverters._
 
 object ScalaPlaylistFactory {
-  def foreverPlaylist(list : java.util.List[String]) =
-    ForeverPlaylist(ArrayBuffer.from(list.asScala))
+  def simplePlaylist(list : java.util.List[String]) =
+    SimplePlaylist(ArrayBuffer.from(list.asScala))
 }

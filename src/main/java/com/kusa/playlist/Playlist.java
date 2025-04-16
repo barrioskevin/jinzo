@@ -2,26 +2,25 @@ package com.kusa.playlist;
 
 import java.util.List;
 
+import com.kusa.util.PlaylistFile;
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+
 public interface Playlist {
-  //controls
-  String next();
-  String skipTo(int pIndex);
+  public static Playlist dailyPlaylist(PlaylistFile pf)
+  {
+    String day = LocalDateTime.now().getDayOfWeek().name().toLowerCase();
+    return pf.playlistFromSection(day);
+  }
 
-  //true if playlist changed after call.
-  boolean add(String mrl);
-  boolean remove(String mrl);
-  boolean remove(int pIndex);
-  boolean clear();
-  boolean isEmpty();
+  List<String> trackList();
+  String trackAt(int index);
 
+  //in place implementation.
+  //ideaully this shuffles 'tracklist'
   void shuffle();
 
-  //true if mrl is in playlist.
-  boolean contains(String mrl);
-
-  //getters
-  String current();
-  int index();
   int size();
-  List<String> trackList();
+  boolean contains(String mrl);
+  boolean isEmpty();
 }
