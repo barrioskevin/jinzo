@@ -3,24 +3,25 @@ package com.kusa;
 import com.kusa.jobs.DownloadFromDrive;
 import com.kusa.jobs.ServerSocketController;
 import com.kusa.jobs.UpdateSidePanel;
-import com.kusa.util.PlaylistFile;
 import com.kusa.player.AppFrame;
 import com.kusa.player.SidePanel;
 import com.kusa.player.SingleVideoPanel;
 import com.kusa.player.VideoPanel;
 import com.kusa.playlist.Playlist;
 import com.kusa.service.GDriveService;
+import com.kusa.service.LocalService;
+import com.kusa.util.PlaylistFile;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.io.IOException;
 import javax.swing.SwingUtilities;
 
 /**
@@ -69,7 +70,7 @@ public class JinzoApp {
    *   |________________________________________________|
    *                <--- screenWidth --->
    */
-  
+
   private PlaylistFile leftPanelPlaylistFile;
   private PlaylistFile rightPanelPlaylistFile;
   private PlaylistFile videoPanelPlaylistFile;
@@ -87,29 +88,39 @@ public class JinzoApp {
 
     //app crashes if can't read playlist configs.
     try {
-      videoPanelPlaylistFile = new PlaylistFile(Config.playlistFiles()[0]); 
-      leftPanelPlaylistFile = new PlaylistFile(Config.playlistFiles()[1]); 
-      rightPanelPlaylistFile = new PlaylistFile(Config.playlistFiles()[2]); 
+      videoPanelPlaylistFile = new PlaylistFile(Config.playlistFiles()[0]);
+      leftPanelPlaylistFile = new PlaylistFile(Config.playlistFiles()[1]);
+      rightPanelPlaylistFile = new PlaylistFile(Config.playlistFiles()[2]);
     } catch (IOException ioexception) {
       ioexception.printStackTrace();
       System.exit(1);
     }
 
     //init panels.
+    //we dont pass image to side panels becuause
+    //the executor will handle setting images.
     left = new SidePanel(
-      null,
-      screenWidth() / 3,
-      screenHeight()
+      LocalService.screenWidth / 3,
+      LocalService.screenHeight
     );
     right = new SidePanel(
-      null,
-      screenWidth() / 3,
-      screenHeight()
+      LocalService.screenWidth / 3,
+      LocalService.screenHeight
     );
     middle = new SingleVideoPanel(videoPanelPlaylistFile, gds);
 
-    leftPanelUpdater = new UpdateSidePanel(left, leftPanelPlaylistFile, "LEFT-PANEL", 0);
-    rightPanelUpdater = new UpdateSidePanel(right, rightPanelPlaylistFile, "RIGHT-PANEL", 0);
+    leftPanelUpdater = new UpdateSidePanel(
+      left,
+      leftPanelPlaylistFile,
+      "LEFT-PANEL",
+      0
+    );
+    rightPanelUpdater = new UpdateSidePanel(
+      right,
+      rightPanelPlaylistFile,
+      "RIGHT-PANEL",
+      0
+    );
 
     //sumbit repeating fixed rate tasks to executor.
     scheduleTasks();
@@ -136,14 +147,6 @@ public class JinzoApp {
 
     //setup command controller.
     executor.submit(new ServerSocketController(this));
-  }
-
-  private int screenWidth() {
-    return AppFrame.device.getDisplayMode().getWidth();
-  }
-
-  private int screenHeight() {
-    return AppFrame.device.getDisplayMode().getHeight();
   }
 
   //playlists and panels should be initialized before calling this.
@@ -246,7 +249,9 @@ public class JinzoApp {
     return right.currentMedia();
   }
 
-  public List<String> videoPanelTrackList() { return middle.tracks(); } 
+  public List<String> videoPanelTrackList() {
+    return middle.tracks();
+  }
 
   /**
    * True if app frame is open.
