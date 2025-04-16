@@ -6,6 +6,8 @@ import com.kusa.util.PlaylistFile;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.util.Set;
 import javax.imageio.ImageIO;
 
@@ -34,7 +36,9 @@ public class UpdateSidePanel implements Runnable {
     this.panelName = name;
     this.panel = panel;
     this.playlistFile = playlistFile;
-    this.playlist = Playlist.dailyPlaylist(playlistFile);
+
+    String day = LocalDateTime.now().getDayOfWeek().name().toLowerCase();
+    this.playlist = playlistFile.playlistFromSection(day);
     this.index = startingIndex;
   }
 
@@ -47,7 +51,8 @@ public class UpdateSidePanel implements Runnable {
 
       //the photos come from side panel static method.
       this.playlistFile.reload();
-      this.playlist = Playlist.dailyPlaylist(playlistFile);
+      String day = LocalDateTime.now().getDayOfWeek().name().toLowerCase();
+      this.playlist = playlistFile.playlistFromSection(day);
 
       log(
         String.format(
