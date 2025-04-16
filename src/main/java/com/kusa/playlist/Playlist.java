@@ -1,14 +1,12 @@
 package com.kusa.playlist;
 
-import java.util.List;
-
 import com.kusa.util.PlaylistFile;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface Playlist {
-  public static Playlist dailyPlaylist(PlaylistFile pf)
-  {
+  public static Playlist dailyPlaylist(PlaylistFile pf) {
     String day = LocalDateTime.now().getDayOfWeek().name().toLowerCase();
     return pf.playlistFromSection(day);
   }
@@ -17,7 +15,7 @@ public interface Playlist {
   String trackAt(int index);
 
   //in place implementation.
-  //ideaully this shuffles 'tracklist'
+  //ideally this shuffles 'tracklist'
   void shuffle();
 
   int size();

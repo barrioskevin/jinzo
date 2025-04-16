@@ -4,10 +4,10 @@ package com.kusa.player;
 import java.awt.Dimension;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-//panel reference
-import javax.swing.JPanel;
 //util
 import java.util.List;
+//panel reference
+import javax.swing.JPanel;
 
 public interface VideoPanel {
   /**
