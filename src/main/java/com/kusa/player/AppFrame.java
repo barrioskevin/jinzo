@@ -1,8 +1,7 @@
 package com.kusa.player;
 
+import com.kusa.service.LocalService;
 import java.awt.BorderLayout;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -18,15 +17,6 @@ import javax.swing.WindowConstants;
  *
  */
 public class AppFrame extends JFrame {
-
-  /**
-   * GraphicsDevice of the screen that the device is running on.
-   *
-   * might not work for all enviornments. but we define the screen
-   * so that we can make our app go into full screen mode after launching.
-   */
-  public static GraphicsDevice device =
-    GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
 
   private SidePanel leftPanel;
   private VideoPanel middlePanel;
@@ -113,9 +103,11 @@ public class AppFrame extends JFrame {
   /**
    * Toggles this frame to be full screen on systems main device.
    *
+   * relies on local service for device reference.
+   *
    * displays this frame on full screen or returns to windowed.
    */
   public void fullscreen() {
-    device.setFullScreenWindow(this);
+    LocalService.device.setFullScreenWindow(this);
   }
 }

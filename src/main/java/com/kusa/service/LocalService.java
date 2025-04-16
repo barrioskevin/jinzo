@@ -1,6 +1,8 @@
 package com.kusa.service;
 
 import com.kusa.Config;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -9,6 +11,21 @@ import java.util.Queue;
 import java.util.Set;
 
 public class LocalService {
+
+  /**
+   * GraphicsDevice of the screen that the device is running on.
+   *
+   * might not work for all enviornments. but we define the screen
+   * so that we can make our app go into full screen mode after launching.
+   */
+  public static GraphicsDevice device =
+    GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
+
+  /**
+   * quick references to width and height of device.
+   */
+  public static final int screenHeight = device.getDisplayMode().getHeight();
+  public static final int screenWidth = device.getDisplayMode().getWidth();
 
   //aliases
   public static final String videosPath =
