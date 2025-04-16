@@ -1,6 +1,6 @@
 package com.kusa.player;
 
-import com.kusa.playlist.Playlist;
+import com.kusa.playlist.PlaylistSession;
 import com.kusa.service.GDriveService;
 import com.kusa.util.PlaylistFile;
 import java.util.List;
@@ -20,9 +20,7 @@ public class SingleVideoPanel
   extends EmbeddedMediaPlayerComponent
   implements VideoPanel {
 
-  private PlaylistFile playlistFile;
-  private Playlist playlist;
-  private int playlistIndex;
+  private PlaylistSession playlistSession;
 
   //gds is injected to the video panel but currently we don't use it.
   private GDriveService gds;
@@ -30,16 +28,16 @@ public class SingleVideoPanel
   /**
    * Constructs a video panel for use in an engagment frame.
    *
-   * @param playlist_ the playlist dictating the media panel will play.
+   * the session we use attempts to stay up to date with the config
+   * passed in (playlistFile_) .
+   *
+   * @param playlistfile_ the player builds a session based off the file passed in.
    * @param gds_ the apps google drive service.
    */
   public SingleVideoPanel(PlaylistFile playlistFile_, GDriveService gds_) {
     super();
-    this.playlistFile = playlistFile_;
+    this.playlistSession = new PlaylistSession(playlistFile_);
     this.gds = gds_;
-    this.playlist = Playlist.dailyPlaylist(playlistFile);
-    this.playlistIndex = 0;
-
     setOpaque(true); //maybe remove?
     setCursorEnabled(false); //kind of works. (ONLY OVER VID PANEL)
   }
@@ -58,14 +56,11 @@ public class SingleVideoPanel
    */
   @Override
   public void start() {
-    final String track = playlist.trackAt(playlistIndex);
+    final String track = playlistSession.current();
+    final int idx = playlistSession.getIndex();
     mediaPlayer().media().play(track);
     log(
-      String.format(
-        "Starting video panel.\n [index]:%d\n [vid]:%s",
-        playlistIndex,
-        track
-      )
+      String.format("Starting video panel.\n [index]:%d\n [vid]:%s", idx, track)
     );
   }
 
@@ -81,8 +76,8 @@ public class SingleVideoPanel
     log(
       String.format(
         "Now playing:\n [index]%d\n [vid]:%s",
-        playlistIndex,
-        playlist.trackAt(playlistIndex)
+        playlistSession.getIndex(),
+        playlistSession.current()
       )
     );
     mp
@@ -103,21 +98,22 @@ public class SingleVideoPanel
    */
   @Override
   public void finished(MediaPlayer mp) {
-    if (playlist.isEmpty()) log("[WARNING] Video panel playlist is empty!!!");
+    if (playlistSession.isEmpty()) log(
+      "[WARNING] Video panel playlist is empty!!!"
+    );
     log("a video just finished.");
 
-    //advance index and see if we are at end.
-    if (++playlistIndex == playlist.size()) {
-      log("playlist ended! reloading playlist...");
-      playlistFile.reload();
-      playlist = Playlist.dailyPlaylist(playlistFile);
-      playlist.shuffle();
-      playlistIndex = 0;
+    playlistSession.next();
 
+    //track end for logging only... (maybe log in session instead?)
+    if (playlistSession.getIndex() == 0) {
       log(
-        String.format("new playlist loaded with %d tracks.", playlist.size())
+        String.format(
+          "new playlist loaded with %d tracks.",
+          playlistSession.size()
+        )
       );
-      List<String> tracks = playlist.trackList();
+      List<String> tracks = playlistSession.sessionTrackList();
       for (int i = 0; i < tracks.size(); i++) log(
         String.format(" [%d] : %s", i, tracks.get(i))
       );
@@ -128,7 +124,7 @@ public class SingleVideoPanel
         mediaPlayer()
           .media()
           .play(
-            playlist.trackAt(playlistIndex),
+            playlistSession.current(),
             "--avcodec-hw=mmal",
             "--no-xlib",
             "--no-osd",
@@ -191,7 +187,7 @@ public class SingleVideoPanel
 
   @Override
   public List<String> tracks() {
-    return playlist.trackList();
+    return playlistSession.sessionTrackList();
   }
 
   private void log(String message) {
