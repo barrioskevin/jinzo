@@ -29,11 +29,15 @@ public class PlaylistFile {
   private String path;
   private Map<String, List<String>> sections;
 
-  public PlaylistFile(String p) throws IOException {
-    this.path = p;
+  public PlaylistFile(File config) throws IOException {
+    this.path = config.getAbsolutePath();
     this.sections = new HashMap<>();
-    this.playlistFile = new File(p);
+    this.playlistFile = config;
     this.generate();
+  }
+
+  public PlaylistFile(String p) throws IOException {
+    this(new File(p));
   }
 
   //generate should be called anytime the FILE is updated.
