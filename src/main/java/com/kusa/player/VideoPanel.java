@@ -42,12 +42,17 @@ public interface VideoPanel {
     return Math.max(widthScale, heightScale);
   }
 
+  //controls
   void start();
   void stop();
   void pause();
   void shutdown();
+
+  //info
   boolean isPlaying();
   String currentMedia();
   List<String> tracks();
+
+  //references
   JPanel panel();
 }
