@@ -128,7 +128,7 @@ public class PlaylistSession {
   }
 
   public void add(String media) {
-    add(media, playlist.size() - 1);
+    add(media, playlist.size());
   }
 
   public void add(String media, int index) {
