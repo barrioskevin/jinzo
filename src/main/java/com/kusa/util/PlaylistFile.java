@@ -1,7 +1,6 @@
 package com.kusa.util;
 
 import com.kusa.playlist.ScalaPlaylistFactory;
-import com.kusa.playlist.CircularQueuePlaylist;
 import com.kusa.playlist.Playlist;
 import com.kusa.service.LocalService;
 import java.io.File;
@@ -22,12 +21,12 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 
 /**
- *
  * Playlist file containing helpful utilites to bridge
  * a playlist file to com.kusa.playlist.Playlist object.
- *
  */
 public class PlaylistFile {
+
+  
 
   private File playlistFile;
   private String path;
@@ -68,77 +67,60 @@ public class PlaylistFile {
     }
   }
 
-  //returns the latest playlist obj of this playlist file.
-  //USES circular queue playlist!
-  public Playlist latest() {
-    List<String> latestPlaylistContents = new ArrayList<>();
-    switch (LocalDateTime.now().getDayOfWeek()) {
-      case MONDAY:
-        if (sections.get("monday") != null) for (String content : sections.get(
-          "monday"
-        )) latestPlaylistContents.addAll(resolvePlaylistContent(content));
-        break;
-      case TUESDAY:
-        if (sections.get("tuesday") != null) for (String content : sections.get(
-          "tuesday"
-        )) latestPlaylistContents.addAll(resolvePlaylistContent(content));
-        break;
-      case WEDNESDAY:
-        if (
-          sections.get("wednesday") != null
-        ) for (String content : sections.get(
-          "wednesday"
-        )) latestPlaylistContents.addAll(resolvePlaylistContent(content));
-        break;
-      case THURSDAY:
-        if (
-          sections.get("thursday") != null
-        ) for (String content : sections.get(
-          "thursday"
-        )) latestPlaylistContents.addAll(resolvePlaylistContent(content));
-        break;
-      case FRIDAY:
-        if (sections.get("friday") != null) for (String content : sections.get(
-          "friday"
-        )) latestPlaylistContents.addAll(resolvePlaylistContent(content));
-        break;
-      case SATURDAY:
-        if (
-          sections.get("saturday") != null
-        ) for (String content : sections.get(
-          "saturday"
-        )) latestPlaylistContents.addAll(resolvePlaylistContent(content));
-        break;
-      case SUNDAY:
-        if (sections.get("sunday") != null) for (String content : sections.get(
-          "sunday"
-        )) latestPlaylistContents.addAll(resolvePlaylistContent(content));
-        break;
-    }
-
-    /*
-     *
-     * bascially i need to keep track of a "to inlcude" sections. 
-     *  + hanlde the special cases such as day of week accordingly.
-     *
-     * 
-     *
-     * (loop for adding in all sections that aren't day of the week)
-    for(String sectionName : sections.keySet())
-    {
-      
-      if(!sectionName.equals("monday") && !sectionName.equals("tuesday") && !sectionName.equals("wednesday") && !sectionName.equals("thursday") && !sectionName.equals("friday") && !sectionName.equals("saturday") && !sectionName.equals("sunday"))
-      {
-        for(String content : sections.get(sectionName))
-          latestPlaylistContents.addAll(resolvePlaylistContent(content));
-      }
-    }
-    */
-
-    return ScalaPlaylistFactory.foreverPlaylist(latestPlaylistContents);
+  /**
+   * Will attempt to read playlist from file and update
+   * the internal structures. 
+   *
+   * by succesful we mean
+   * doesn't include any checks to see if there
+   * were any changes or not. it will return true
+   * if there was no exception and generate was executed.
+   *
+   * we might want to handle the exception later..
+   *
+   * @return true if the reload was succesful.
+   */
+  public boolean reload() {
+    try {
+      sections.clear();
+      generate();
+      return true;
+    } catch (Exception ex) { ; }
+    return false;
   }
 
-  //could be a single file, a folder of files, ...
+  /**
+   * Returns all the tracks from a specific section.
+   *
+   * @param section name
+   * @return list of mrls in the section or empty.
+   */
+  public Playlist playlistFromSection(String section) {
+    List<String> ret = new ArrayList<>();
+    if (sections.get(section) != null)
+      for(String content : sections.get(section))
+        ret.addAll(resolvePlaylistContent(content));
+    return ScalaPlaylistFactory.simplePlaylist(ret);
+  }
+  public int sectionCount() {
+    return sections.keySet().size();
+  }
+
+  public Set<String> sectionNames() {
+    return sections.keySet();
+  }
+    
+  /*
+   * this method is part of the parsing process of .playlist files.
+   * when reading each line under a section it could represent any of
+   * the following...
+   *  - single file
+   *  - a folder of files
+   *  - a folder including all nested folders
+   *
+   * we resolve that here to turn those representations into
+   * valid mrls. (commonly absolute local file paths).
+   */
   private List<String> resolvePlaylistContent(String content) {
     String[] parts = content.split("/");
     if (parts[parts.length - 1].contains("*")) {
@@ -164,13 +146,5 @@ public class PlaylistFile {
       return nestedContent;
     } else if (LocalService.fileExists(content)) return List.of(content);
     else return Collections.emptyList();
-  }
-
-  public int sectionCount() {
-    return sections.keySet().size();
-  }
-
-  public Set<String> sectionNames() {
-    return sections.keySet();
   }
 }
