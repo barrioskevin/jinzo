@@ -1,51 +1,15 @@
 package com.kusa.player;
 
-//retreiving videos
-import com.kusa.Config;
-import com.kusa.service.LocalService;
-import com.kusa.util.PlaylistFile;
 //for calculatinng scale
 import java.awt.Dimension;
-//exceptions ?!
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.DayOfWeek;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 //panel reference
 import javax.swing.JPanel;
+//util
+import java.util.List;
 
 public interface VideoPanel {
-  /**
-   * Will return the latest videos based on the configured playlist file.
-   *
-   * the playlist file is what makes up where we grab the videos from.
-   *  see PlaylistFile.latest()
-   *
-   * the file seperates content into sections, there are special sections
-   * corresponding to the days of the week which will handle playing
-   * specific videos on specific days.
-   *
-   * @return set of video paths from latest playlist or empty if playlist failed to read.
-   */
-  public static Set<String> videoMRLS() {
-    try {
-      //Config.playlistFiles()[0]
-      // could be a property to have panel choose a playlist
-      PlaylistFile myPlaylist = new PlaylistFile(Config.playlistFiles()[0]);
-      return new HashSet<String>(myPlaylist.latest().trackList());
-    } catch (IOException ioEx) {
-      ioEx.printStackTrace();
-    } catch (Exception x) {
-      //out of bounds execption.
-      //maybe default to other existing playlists?
-      x.printStackTrace();
-    }
-    return new HashSet<String>();
-  }
-
   /**
    * Attempts to find a correct scale to ensure the container will
    * be filled with video content.
@@ -83,5 +47,7 @@ public interface VideoPanel {
   void pause();
   void shutdown();
   boolean isPlaying();
+  String currentMedia();
+  List<String> tracks();
   JPanel panel();
 }
