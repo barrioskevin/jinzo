@@ -1,7 +1,6 @@
 package com.kusa.util;
 
 import com.kusa.playlist.Playlist;
-import com.kusa.playlist.ScalaPlaylistFactory;
 import com.kusa.service.LocalService;
 import java.io.File;
 import java.io.IOException;
@@ -98,7 +97,7 @@ public class PlaylistFile {
     if (sections.get(section) != null) for (String content : sections.get(
       section
     )) ret.addAll(resolvePlaylistContent(content));
-    return ScalaPlaylistFactory.simplePlaylist(ret);
+    return Playlist.fromList(ret);
   }
 
   public int sectionCount() {
