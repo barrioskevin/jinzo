@@ -123,26 +123,15 @@ public class ServerSocketController implements Runnable {
   //something we can send to the buffered writer.
   private String getPlayingMessage(String panel) {
     String media = "n/a";
-    int idx = -1;
-    //add indexes here!
     if (panel.equals("left")) media = jinzoApp.currentLeftPanelMedia();
     if (panel.equals("right")) media = jinzoApp.currentRightPanelMedia();
-    if (panel.equals("video")) {
+    if (panel.equals("video"))
       media = jinzoApp.currentVideoPanelMedia();
-      idx = jinzoApp.currentVideoIndex();
-    }
-    return idx != -1
-      ? String.format(
-        "Jinzo App's %s panel is currently playing [%d] %s\n",
-        panel,
-        idx,
-        media
-      )
-      : String.format(
+    return String.format(
         "Jinzo App's %s panel is currently playing %s\n",
         panel,
         media
-      );
+    );
   }
 
   //calls tracklist on jinzo app and returns something
@@ -150,13 +139,13 @@ public class ServerSocketController implements Runnable {
   private String getTracklistMessage() {
     if (!jinzoApp.isRunning()) return "Jinzo App is not currently running.\n";
 
-    List<String> tracks = jinzoApp.videoTrackList();
+    List<String> tracks = jinzoApp.videoPanelTrackList();
     StringBuilder sb = new StringBuilder();
     sb.append("Loading Jinzo App's TrackList...\n");
     sb.append(String.format("Found %d tracks...\n", tracks.size()));
     for (int i = 0; i < tracks.size(); i++) {
       String track = tracks.get(i);
-      if (i == jinzoApp.currentVideoIndex()) sb.append("*Playing Now* ");
+      if (track.equals(jinzoApp.currentVideoPanelMedia())) sb.append("*Playing Now* ");
       sb.append(String.format("[%d] %s\n", i, track));
     }
     return sb.toString();
