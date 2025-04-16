@@ -61,7 +61,7 @@ public class AppFrame extends JFrame {
       new WindowAdapter() {
         @Override
         public void windowClosing(WindowEvent e) {
-          shutdown();
+          shutdown(); //shutdown on window close.
         }
 
         @Override
