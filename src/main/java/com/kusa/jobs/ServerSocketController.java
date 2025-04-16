@@ -125,12 +125,11 @@ public class ServerSocketController implements Runnable {
     String media = "n/a";
     if (panel.equals("left")) media = jinzoApp.currentLeftPanelMedia();
     if (panel.equals("right")) media = jinzoApp.currentRightPanelMedia();
-    if (panel.equals("video"))
-      media = jinzoApp.currentVideoPanelMedia();
+    if (panel.equals("video")) media = jinzoApp.currentVideoPanelMedia();
     return String.format(
-        "Jinzo App's %s panel is currently playing %s\n",
-        panel,
-        media
+      "Jinzo App's %s panel is currently playing %s\n",
+      panel,
+      media
     );
   }
 
@@ -145,7 +144,9 @@ public class ServerSocketController implements Runnable {
     sb.append(String.format("Found %d tracks...\n", tracks.size()));
     for (int i = 0; i < tracks.size(); i++) {
       String track = tracks.get(i);
-      if (track.equals(jinzoApp.currentVideoPanelMedia())) sb.append("*Playing Now* ");
+      if (jinzoApp.currentVideoPanelMedia().contains(track)) sb.append(
+        "*Playing Now* "
+      );
       sb.append(String.format("[%d] %s\n", i, track));
     }
     return sb.toString();
