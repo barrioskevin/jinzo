@@ -3,12 +3,11 @@ package com.kusa;
 import com.kusa.jobs.DownloadFromDrive;
 import com.kusa.jobs.ServerSocketController;
 import com.kusa.jobs.UpdateSidePanel;
+import com.kusa.util.PlaylistFile;
 import com.kusa.player.AppFrame;
 import com.kusa.player.SidePanel;
 import com.kusa.player.SingleVideoPanel;
-import com.kusa.player.VideoListPanel;
 import com.kusa.player.VideoPanel;
-import com.kusa.playlist.CircularQueuePlaylist;
 import com.kusa.playlist.Playlist;
 import com.kusa.service.GDriveService;
 import java.awt.event.KeyAdapter;
@@ -21,6 +20,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.io.IOException;
 import javax.swing.SwingUtilities;
 
 /**
@@ -47,6 +47,9 @@ public class JinzoApp {
   private final ScheduledExecutorService executor;
   private final AppFrame engagementFrame;
 
+  private final SidePanel left;
+  private final SidePanel right;
+  private final VideoPanel middle;
   /*
    *      (left)            (middle)         (right)
    *   |----------------                ________________|
@@ -66,46 +69,47 @@ public class JinzoApp {
    *   |________________________________________________|
    *                <--- screenWidth --->
    */
-  private SidePanel left;
-  private SidePanel right;
-  private VideoPanel middle;
+  
+  private PlaylistFile leftPanelPlaylistFile;
+  private PlaylistFile rightPanelPlaylistFile;
+  private PlaylistFile videoPanelPlaylistFile;
 
-  private Playlist leftPanelPlaylist;
-  private Playlist rightPanelPlaylist;
-  private Playlist videoPlaylist;
+  private UpdateSidePanel leftPanelUpdater;
+  private UpdateSidePanel rightPanelUpdater;
 
   public JinzoApp(GDriveService gds) {
     this.gds = gds;
-    this.middle = middle;
     this.running = false;
     this.executor = Executors.newScheduledThreadPool(
       3,
       Executors.defaultThreadFactory()
     );
 
-    //init playlists.
-    leftPanelPlaylist = new CircularQueuePlaylist(
-      new ArrayList<String>(SidePanel.photoMRLS(true))
-    );
-    rightPanelPlaylist = new CircularQueuePlaylist(
-      new ArrayList<String>(SidePanel.photoMRLS(false))
-    );
-    videoPlaylist = new CircularQueuePlaylist(
-      new ArrayList<String>(VideoPanel.videoMRLS())
-    );
+    //app crashes if can't read playlist configs.
+    try {
+      videoPanelPlaylistFile = new PlaylistFile(Config.playlistFiles()[0]); 
+      leftPanelPlaylistFile = new PlaylistFile(Config.playlistFiles()[1]); 
+      rightPanelPlaylistFile = new PlaylistFile(Config.playlistFiles()[2]); 
+    } catch (IOException ioexception) {
+      ioexception.printStackTrace();
+      System.exit(1);
+    }
 
     //init panels.
     left = new SidePanel(
-      leftPanelPlaylist.current(),
+      null,
       screenWidth() / 3,
       screenHeight()
     );
     right = new SidePanel(
-      rightPanelPlaylist.current(),
+      null,
       screenWidth() / 3,
       screenHeight()
     );
-    middle = new SingleVideoPanel(videoPlaylist, gds);
+    middle = new SingleVideoPanel(videoPanelPlaylistFile, gds);
+
+    leftPanelUpdater = new UpdateSidePanel(left, leftPanelPlaylistFile, "LEFT-PANEL", 0);
+    rightPanelUpdater = new UpdateSidePanel(right, rightPanelPlaylistFile, "RIGHT-PANEL", 0);
 
     //sumbit repeating fixed rate tasks to executor.
     scheduleTasks();
@@ -131,8 +135,6 @@ public class JinzoApp {
     );
 
     //setup command controller.
-    //  -- maybe pass reference to **this** --
-    //        instead of middle.
     executor.submit(new ServerSocketController(this));
   }
 
@@ -153,21 +155,22 @@ public class JinzoApp {
       TimeUnit.MINUTES //download from drive every 15 min
     );
     executor.scheduleAtFixedRate(
-      new UpdateSidePanel(left, leftPanelPlaylist, true),
+      leftPanelUpdater,
       0L,
       5L,
-      TimeUnit.MINUTES //(call playlist.next) every 5 minutes
+      TimeUnit.MINUTES //(set next playlist item) every 5 minutes
     );
     executor.scheduleAtFixedRate(
-      new UpdateSidePanel(right, rightPanelPlaylist, false),
+      rightPanelUpdater,
       0L,
       5L,
-      TimeUnit.MINUTES //(call playlist.next) every 5 minutes
+      TimeUnit.MINUTES //(set next playlist item) every 5 minutes
     );
   }
 
   /**
    * starts the player in full screen mode.
+   * not to be confused with a runnable.
    *
    * does nothing if already running.
    * makes sure to set focus.
@@ -224,25 +227,7 @@ public class JinzoApp {
    * @return current media from playlist or empty.
    */
   public String currentVideoPanelMedia() {
-    if (!running) return "";
-    return videoPlaylist.current();
-  }
-
-  public int currentVideoIndex() {
-    if (!running) return -1;
-    if (videoPlaylist.index() == 0) return videoPlaylist.size() - 1;
-    return videoPlaylist.index() - 1;
-  }
-
-  /**
-   * If the player is running this will return the tracklist
-   * that is loaded into 'videoPlaylist'.
-   *
-   * @return video playlist's tracklist or empty.
-   */
-  public List<String> videoTrackList() {
-    if (!running) return Collections.emptyList();
-    return videoPlaylist.trackList();
+    return middle.currentMedia();
   }
 
   /**
@@ -250,8 +235,7 @@ public class JinzoApp {
    * @return string representing mrl of left panel's image or empty.
    */
   public String currentLeftPanelMedia() {
-    if (!running) return "";
-    return leftPanelPlaylist.current();
+    return left.currentMedia();
   }
 
   /**
@@ -259,9 +243,10 @@ public class JinzoApp {
    * @return string representing mrl of right panel's image or empty.
    */
   public String currentRightPanelMedia() {
-    if (!running) return "";
-    return rightPanelPlaylist.current();
+    return right.currentMedia();
   }
+
+  public List<String> videoPanelTrackList() { return middle.tracks(); } 
 
   /**
    * True if app frame is open.
