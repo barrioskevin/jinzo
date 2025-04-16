@@ -1,22 +1,13 @@
 package com.kusa.player;
 
-import com.kusa.Config;
 import com.kusa.playlist.Playlist;
 import com.kusa.service.GDriveService;
-import com.kusa.service.LocalService;
-import com.kusa.util.PathedFile;
-import java.time.DayOfWeek;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
+import com.kusa.util.PlaylistFile;
 import java.util.List;
-import java.util.Set;
-import java.util.Timer;
 import javax.swing.JPanel;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.base.events.MediaPlayerEvent;
-import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
 
 /**
@@ -29,7 +20,9 @@ public class SingleVideoPanel
   extends EmbeddedMediaPlayerComponent
   implements VideoPanel {
 
+  private PlaylistFile playlistFile;
   private Playlist playlist;
+  private int playlistIndex;
 
   //gds is injected to the video panel but currently we don't use it.
   private GDriveService gds;
@@ -40,17 +33,19 @@ public class SingleVideoPanel
    * @param playlist_ the playlist dictating the media panel will play.
    * @param gds_ the apps google drive service.
    */
-  public SingleVideoPanel(Playlist playlist_, GDriveService gds_) {
+  public SingleVideoPanel(PlaylistFile playlistFile_, GDriveService gds_) {
     super();
-    playlist = playlist_;
-    gds = gds_;
+    this.playlistFile = playlistFile_;
+    this.gds = gds_;
+    this.playlist = Playlist.dailyPlaylist(playlistFile);
+    this.playlistIndex = 0;
 
     setOpaque(true); //maybe remove?
     setCursorEnabled(false); //kind of works. (ONLY OVER VID PANEL)
   }
 
   /**
-   * Advances the playlist and plays the next media.
+   * Plays the media (no submit).
    * expects the media player to be <strong>Stopped.</strong>
    *
    * called by the main app to start the video panel.
@@ -58,14 +53,15 @@ public class SingleVideoPanel
    * because this video panel takes care of starting new videos
    * after one ends this method should only be called once
    * after the engagment frame has been created.
+   *
+   * NOTE - we don't advance the index here.
    */
   @Override
   public void start() {
-    final int idx = playlist.index();
-    final String mrl = playlist.next();
-    mediaPlayer().media().play(mrl);
+    final String track = playlist.trackAt(playlistIndex);
+    mediaPlayer().media().play(track);
     log(
-      String.format("Starting video panel.\n [index]:%d\n [vid]:%s", idx, mrl)
+      String.format("Starting video panel.\n [index]:%d\n [vid]:%s", playlistIndex, track)
     );
   }
 
@@ -78,6 +74,7 @@ public class SingleVideoPanel
    */
   @Override
   public void playing(MediaPlayer mp) {
+    log(String.format("Now playing:\n [index]%d\n [vid]:%s", playlistIndex, playlist.trackAt(playlistIndex)));
     mp
       .video()
       .setScale(VideoPanel.calcScale(mp.video().videoDimension(), getSize()));
@@ -97,45 +94,30 @@ public class SingleVideoPanel
   @Override
   public void finished(MediaPlayer mp) {
     if (playlist.isEmpty()) log("[WARNING] Video panel playlist is empty!!!");
-
     log("a video just finished.");
 
-    boolean willShuffle = false;
-    if (playlist.index() == 0) {
-      log("playlist ended! calling clear...");
-      playlist.clear();
-      willShuffle = true;
-    }
-
-    Set<String> mrls = VideoPanel.videoMRLS();
-    Set<String> currentTracks = new HashSet<>(playlist.trackList());
-    for (String video : mrls) {
-      if (!currentTracks.contains(video)) {
-        log(String.format("found new video! adding %s to playlist.", video));
-        playlist.add(video);
-      }
-    }
-
-    if (willShuffle) {
-      log("Shuffling Playlist!");
+    //advance index and see if we are at end.
+    if(playlistIndex++ == playlist.size())
+    {
+      log("playlist ended! reloading playlist...");
+      playlistFile.reload();
+      playlist = Playlist.dailyPlaylist(playlistFile);
       playlist.shuffle();
+      playlistIndex = 0;
 
-      log(String.format("Start of new playlist! Index = ", playlist.index()));
+      log(String.format("new playlist loaded with %d tracks.", playlist.size()));
       List<String> tracks = playlist.trackList();
       for (int i = 0; i < tracks.size(); i++) log(
         String.format(" [%d] : %s", i, tracks.get(i))
       );
     }
 
-    final int idx = playlist.index();
-    final String mrl = playlist.next();
-
     mediaPlayer()
       .submit(() ->
         mediaPlayer()
           .media()
           .play(
-            mrl,
+            playlist.trackAt(playlistIndex),
             "--avcodec-hw=mmal",
             "--no-xlib",
             "--no-osd",
@@ -144,9 +126,6 @@ public class SingleVideoPanel
             "--quiet"
           )
       );
-
-    log(String.format("Now playing:\n [index]%d\n [vid]:%s", idx, mrl));
-    log(String.format("Next index should be %d", playlist.index()));
   }
 
   @Override
@@ -192,6 +171,16 @@ public class SingleVideoPanel
   @Override
   public boolean isPlaying() {
     return mediaPlayer().status().isPlaying();
+  }
+
+  @Override
+  public String currentMedia() {
+    return mediaPlayer().media().info().mrl();
+  }
+
+  @Override
+  public List<String> tracks() {
+    return playlist.trackList();
   }
 
   private void log(String message) {
