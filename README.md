@@ -20,7 +20,7 @@ The following are required to install and run this application.
 1. Clone the repository:
 
 ```sh
-git clone https://github.com/imawful/jinzo.git
+git clone https://github.com/barrioskevin/jinzo.git
 cd jinzo/
 ```
 
