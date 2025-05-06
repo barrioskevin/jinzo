@@ -86,7 +86,9 @@ public class PlaylistFile {
       sections.clear();
       generate();
       return true;
-    } catch (Exception ex) {}
+    } catch (Exception ex) {
+      System.out.printf("[ERROR] %s : %s\n", ex, ex.getMessage());
+    }
     return false;
   }
 
