@@ -46,6 +46,7 @@ public interface VideoPanel {
   void start();
   void stop();
   void pause();
+  void restart();
   void shutdown();
 
   //info

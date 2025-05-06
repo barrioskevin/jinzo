@@ -87,6 +87,11 @@ public class ServerSocketController implements Runnable {
         //this eventually stops this runnable also.
         jinzoApp.stop();
         break;
+      case "restart":
+      case "RESTART":
+        log("restart command triggered");
+        jinzoApp.restart();
+        break;
       case "playing?":
       case "PLAYING?":
         log("playing? command triggered");

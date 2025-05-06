@@ -214,6 +214,18 @@ public class JinzoApp {
   }
 
   /**
+   * Restarts the video player.
+   * We are restarting the playback. a new instance of the
+   * player will not be created.
+   * 
+   * we still need to implement restarting the side panels also.
+   */
+  public void restart() {
+    if (!running) return;
+    middle.restart();
+  }
+
+  /**
    * pauses the player's playback.
    */
   public void pause() {

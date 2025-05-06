@@ -66,6 +66,13 @@ public class PlaylistSession {
     return playlist.trackAt(index);
   }
 
+  /**
+   * Restarts the playlist at index 0.
+   */
+  public void restart() {
+    onPlaylistEnded();
+  }
+
   public void next() {
     index += 1;
     //here we can check if we should
@@ -89,6 +96,10 @@ public class PlaylistSession {
     return this.playlist.size();
   }
 
+  //We reload the playlist file.
+  //Update the current section we are looking at.
+  //Keep our sessions added + removed tracks in sync.
+  //Shuffle all the collected tracks and set the new playlist.
   private void onPlaylistEnded() {
     source.reload();
     this.section = LocalDateTime.now().getDayOfWeek().name().toLowerCase();

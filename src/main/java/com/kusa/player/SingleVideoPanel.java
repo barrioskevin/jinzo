@@ -161,6 +161,13 @@ public class SingleVideoPanel
   }
 
   @Override
+  public void restart() {
+    stop();
+    playlistSession.restart();
+    start();
+  }
+
+  @Override
   public void paused(MediaPlayer mediaPlayer) {
     log("playback has been paused or resumed.");
   }
