@@ -82,6 +82,27 @@ public class UpdateSidePanel implements Runnable {
     }
   }
 
+  public void restart() {
+    index = 0;
+    this.playlistFile.reload();
+    String day = LocalDateTime.now().getDayOfWeek().name().toLowerCase();
+    this.playlist = playlistFile.playlistFromSection(day);
+    try {
+      BufferedImage nextImage = ImageIO.read(
+        new File(playlist.trackAt(index++))
+      );
+      panel.setImage(nextImage);
+      log(String.format("set new image %s on %s panel", nextImage, panelName));
+    } catch (Exception ex) {
+      log(
+        String.format(
+          "failed to set the next image in %s side panel",
+          panelName
+        )
+      );
+    }
+  }
+
   private void log(String message) {
     System.out.println("[UpdateSidePanel] " + message);
   }

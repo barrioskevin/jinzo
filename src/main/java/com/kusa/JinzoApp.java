@@ -160,14 +160,14 @@ public class JinzoApp {
     executor.scheduleAtFixedRate(
       leftPanelUpdater,
       0L,
-      5L,
-      TimeUnit.MINUTES //(set next playlist item) every 5 minutes
+      15L,
+      TimeUnit.SECONDS //(set next playlist item) every 5 minutes
     );
     executor.scheduleAtFixedRate(
       rightPanelUpdater,
       0L,
-      5L,
-      TimeUnit.MINUTES //(set next playlist item) every 5 minutes
+      15L,
+      TimeUnit.SECONDS //(set next playlist item) every 5 minutes
     );
   }
 
@@ -217,12 +217,14 @@ public class JinzoApp {
    * Restarts the video player.
    * We are restarting the playback. a new instance of the
    * player will not be created.
-   * 
+   *
    * we still need to implement restarting the side panels also.
    */
   public void restart() {
     if (!running) return;
     middle.restart();
+    leftPanelUpdater.restart();
+    rightPanelUpdater.restart();
   }
 
   /**
