@@ -80,6 +80,14 @@ public class ServerSocketController implements Runnable {
       case "PAUSE":
         log("pause command triggered");
         jinzoApp.pause();
+        try {
+          Thread.sleep(500);
+        } catch (InterruptedException ie) {
+          Thread.currentThread().interrupt();
+          log("waiting for pause (interrupted)");
+        }
+        writer.write(jinzoApp.status());
+        writer.flush();
         break;
       case "stop":
       case "STOP":

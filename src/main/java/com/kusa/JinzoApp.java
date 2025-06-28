@@ -213,6 +213,12 @@ public class JinzoApp {
     }
   }
 
+  public String status() {
+    if (middle.isPlaying())
+      return "Video is playing.";
+    return "Video is paused/stopped.";
+  }
+
   /**
    * Restarts the video player.
    * We are restarting the playback. a new instance of the
