@@ -1,7 +1,5 @@
 package com.kusa;
 
-import com.kusa.service.GDriveService;
-
 /**
  * Main class.
  *
@@ -12,15 +10,8 @@ import com.kusa.service.GDriveService;
  * the engagement frame and run it.
  */
 public class App {
-
+  
   public static void main(String args[]) {
-    //init deps
-    GDriveService gds = new GDriveService();
-
-    //initial downloads.
-    if (gds.isValid()) gds.downloadMedia();
-
-    //start the jinzo app.
-    new JinzoApp(gds).run();
+    new JinzoApp().run();
   }
 }

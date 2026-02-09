@@ -27,12 +27,6 @@ public class LocalService {
   public static final int screenHeight = device.getDisplayMode().getHeight();
   public static final int screenWidth = device.getDisplayMode().getWidth();
 
-  //aliases
-  public static final String videosPath =
-    Config.getProperty("downloadPath") + "videos/";
-  public static final String photosPath =
-    Config.getProperty("downloadPath") + "photos/";
-
   /**
    * Returns true if file exists on the local machine.
    *
@@ -73,8 +67,7 @@ public class LocalService {
     String nestedFolders,
     boolean recursive
   ) {
-    final String searchPath =
-      Config.getProperty("downloadPath") + nestedFolders;
+    final String searchPath = Config.cachePath + nestedFolders;
     Queue<File> folders = new LinkedList<>(List.of(new File(searchPath)));
     Set<String> mrls = new HashSet<>();
     while (!folders.isEmpty()) {

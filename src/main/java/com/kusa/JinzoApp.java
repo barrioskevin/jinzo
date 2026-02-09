@@ -1,6 +1,5 @@
 package com.kusa;
 
-import com.kusa.jobs.DownloadFromDrive;
 import com.kusa.jobs.ServerSocketController;
 import com.kusa.jobs.UpdateSidePanel;
 import com.kusa.player.AppFrame;
@@ -8,7 +7,6 @@ import com.kusa.player.SidePanel;
 import com.kusa.player.SingleVideoPanel;
 import com.kusa.player.VideoPanel;
 import com.kusa.playlist.Playlist;
-import com.kusa.service.GDriveService;
 import com.kusa.service.LocalService;
 import com.kusa.util.PlaylistFile;
 import java.awt.event.KeyAdapter;
@@ -44,7 +42,6 @@ public class JinzoApp {
 
   private boolean running;
 
-  private final GDriveService gds;
   private final ScheduledExecutorService executor;
   private final AppFrame engagementFrame;
 
@@ -78,8 +75,7 @@ public class JinzoApp {
   private UpdateSidePanel leftPanelUpdater;
   private UpdateSidePanel rightPanelUpdater;
 
-  public JinzoApp(GDriveService gds) {
-    this.gds = gds;
+  public JinzoApp() {
     this.running = false;
     this.executor = Executors.newScheduledThreadPool(
       3,
@@ -107,7 +103,7 @@ public class JinzoApp {
       LocalService.screenWidth / 3,
       LocalService.screenHeight
     );
-    middle = new SingleVideoPanel(videoPanelPlaylistFile, gds);
+    middle = new SingleVideoPanel(videoPanelPlaylistFile);
 
     leftPanelUpdater = new UpdateSidePanel(
       left,
@@ -151,12 +147,6 @@ public class JinzoApp {
 
   //playlists and panels should be initialized before calling this.
   private void scheduleTasks() {
-    executor.scheduleAtFixedRate(
-      new DownloadFromDrive(gds, 12, 8),
-      0L,
-      15L,
-      TimeUnit.MINUTES //download from drive every 15 min
-    );
     executor.scheduleAtFixedRate(
       leftPanelUpdater,
       0L,

@@ -14,30 +14,18 @@ import java.util.Properties;
  *
  * <p> An attempt to manage the internal directories seamlessly.
  *
- * <p>.cache/jinzo/ - where the app will place google drive downloads by default.
- *                        auth tokens are also stored here.
+ * <p>.cache/jinzo/ - where the app will place downloads by default.
  *
  * <p>.config/jinzo/ - where the app will place configuration file by default.
  *                        ".playlist" files are also stored here.
- *
- * -- roadmap ---
- *  I need to make sure that the properites file loaded includes all the needed properites.
- *
- *    Service related hm...
- *    # token storage path - (if using google drive api)
- *      - (.cache/jinzo/tokens/)
- *    # app credentials.json - (if using google drive api)
- *      - (.config/jinzo/credentials.json)
- *    # local map of google drive path - (where downloaded drive files go)
- *      - (.cache/jinzo/drive/)
  */
 public class Config {
 
   // this is platform specific. it should work fine on unix-like systems.
-  private static final String cachePath =
-    System.getProperty("user.home") + "/.cache/jinzo/";
-  private static final String configPath =
-    System.getProperty("user.home") + "/.config/jinzo/";
+  public static final String cachePath =
+    System.getProperty("user.home") + "/.cache/jinzo";
+  public static final String configPath =
+    System.getProperty("user.home") + "/.config/jinzo";
   private static Properties props;
 
   /*
@@ -78,7 +66,7 @@ public class Config {
       ) System.out.println(
         "[ERROR] FAILED TO FIND OR CREATE APP'S CONFIG FOLDER."
       );
-      File playlistsFolder = new File(configPath + "playlists");
+      File playlistsFolder = new File(configPath + "/playlists");
       if (!playlistsFolder.exists()) if (
         !playlistsFolder.mkdirs()
       ) System.out.println(
@@ -99,43 +87,17 @@ public class Config {
         );
       }
 
-      System.out.println(
-        "[DEBUG] Google credentials found at:" +
-        getProperty("googleCredentialsPath")
-      );
-      System.out.println(
-        "[DEBUG] Reading tokens from:" + getProperty("tokenStoragePath")
-      );
-      System.out.println(
-        "[DEBUG] Saving drive downloads to:" + getProperty("downloadPath")
-      );
-
-      File driveFolder = new File(getProperty("downloadPath"));
-      if (!driveFolder.exists()) if (!driveFolder.mkdirs()) System.out.println(
-        "[ERROR] FAILED TO FIND OR CREATE DRIVE FOLDER."
-      );
-
-      File tokenFolder = new File(getProperty("tokenStoragePath"));
-      if (!tokenFolder.exists()) if (!tokenFolder.mkdirs()) System.out.println(
-        "[ERROR] FAILED TO FIND OR CREATE TOKEN FOLDER."
-      );
-
-      File appCreds = new File(props.getProperty("googleCredentialsPath"));
-      if (!appCreds.exists()) {
-        System.out.println(
-          "[WARNING] NO APP CREDENTIALS.json FOUND: " +
-          props.getProperty("googleCredentialsPath") +
-          " (DRIVE SERVICES WILL NOT WORK)!"
-        );
-      }
-
       String full = props.getProperty("playlists");
       String[] playlistFileNames = full.split(",");
-      if (playlistFileNames.length > 0) System.out.printf(
-        "[DEBUG] Found %d playlists to load.\n",
-        playlistFileNames.length
-      );
-      else System.out.printf("[ERROR] NO PLAYLIST FILES FOUND!\n");
+      if (playlistFileNames.length > 0) {
+        System.out.printf(
+          "[DEBUG] Found %d playlists to load.\n",
+          playlistFileNames.length
+        );
+      } else { 
+        System.out.println("[ERROR] NO PLAYLIST FILES FOUND!\n"); 
+        System.exit(1);
+      }
 
       for (String name : playlistFileNames) {
         final String playlistPath = name.replace("'", "").trim();
@@ -161,10 +123,7 @@ public class Config {
   /**
    * Returns the value of the property given the property name.
    *
-   * <p>currently the app only has 4 valid properties
-   *  - tokenStoragePath
-   *  - googleCredentialsPath
-   *  - downloadPath
+   * <p>currently the app only has
    *  - playlists
    *
    * <p> these properties are mostly related to google drive and that class
@@ -200,15 +159,8 @@ public class Config {
 
   /*
    * writing the default config file when none is found. (usually on first install)
-   *
-   * credentials.json can NOT be created for you. it will only define the property
-   * with the value of it's default location.
    */
   private static void writeDefaultAppProperties(File file) throws IOException {
-    final String tokenStorage = "tokenStoragePath=" + cachePath + "tokens/";
-    final String googleCreds =
-      "googleCredentialsPath=" + configPath + "credentials.json";
-    final String downloadPath = "downloadPath=" + cachePath + "drive/";
     final String defP1 = String.format(
       "'%splaylists/videopanel.playlist'",
       configPath
@@ -228,29 +180,22 @@ public class Config {
       defP3
     );
     List<String> properties = List.of(
-      tokenStorage,
-      googleCreds,
-      downloadPath,
       playlists
     );
-    try {
-      Files.write(Paths.get(file.getAbsolutePath()), properties);
-    } catch (IOException ioException) {
-      throw ioException;
-    }
+    Files.write(Paths.get(file.getAbsolutePath()), properties);
   }
 
   //defId
   //0 = default to all videos
   //1 = default to all photos
-  private static void writeDefaultPlaylist(File file, int defId) {
+  private static void writeDefaultPlaylist(File file, int defId) throws IOException {
     String include = "";
     switch (defId) {
       case 0:
-        include = String.format("$local-videos\n$drive-videos");
+        include = String.format("$local-videos\n$jinzo-videos\n");
         break;
       case 1:
-        include = String.format("$local-photos\n$drive-photos");
+        include = String.format("$local-photos\n$jinzo-photos\n");
         break;
       default:
         include = "";
@@ -259,12 +204,12 @@ public class Config {
     List<String> sections = List.of(
       "[local-videos]",
       System.getProperty("user.home") + "/Videos/**",
-      "[drive-videos]",
-      cachePath + "drive/videos/**",
+      "[jinzo-videos]",
+      cachePath + "/videos/**",
       "[local-photos]",
       System.getProperty("user.home") + "/Photos/**",
-      "[drive-photos]",
-      cachePath + "drive/photos/**",
+      "[jinzo-photos]",
+      cachePath + "/photos/**",
       "",
       String.format("[monday]\n%s", include),
       String.format("[tuesday]\n%s", include),
@@ -274,11 +219,6 @@ public class Config {
       String.format("[saturday]\n%s", include),
       String.format("[sunday]\n%s", include)
     );
-    try {
-      Files.write(Paths.get(file.getAbsolutePath()), sections);
-    } catch (IOException ioException) {
-      System.out.println("couldn't write default playlist to file.");
-      ioException.printStackTrace();
-    }
+    Files.write(Paths.get(file.getAbsolutePath()), sections);
   }
 }

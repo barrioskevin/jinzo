@@ -1,13 +1,10 @@
 package com.kusa.player;
 
 import com.kusa.playlist.PlaylistSession;
-import com.kusa.service.GDriveService;
 import com.kusa.util.PlaylistFile;
 import java.util.List;
 import javax.swing.JPanel;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
-import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
-import uk.co.caprica.vlcj.player.base.events.MediaPlayerEvent;
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
 
 /**
@@ -22,9 +19,6 @@ public class SingleVideoPanel
 
   private PlaylistSession playlistSession;
 
-  //gds is injected to the video panel but currently we don't use it.
-  private GDriveService gds;
-
   /**
    * Constructs a video panel for use in an engagment frame.
    *
@@ -32,12 +26,10 @@ public class SingleVideoPanel
    * passed in (playlistFile_) .
    *
    * @param playlistfile_ the player builds a session based off the file passed in.
-   * @param gds_ the apps google drive service.
    */
-  public SingleVideoPanel(PlaylistFile playlistFile_, GDriveService gds_) {
+  public SingleVideoPanel(PlaylistFile playlistFile_) {
     super();
     this.playlistSession = new PlaylistSession(playlistFile_);
-    this.gds = gds_;
     setOpaque(true); //maybe remove?
     setCursorEnabled(false); //kind of works. (ONLY OVER VID PANEL)
   }
