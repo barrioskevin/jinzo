@@ -14,7 +14,6 @@ import javax.swing.WindowConstants;
 /**
  * Class representing the main frame.
  * aka: EngagmentFrame (will rename soon).
- *
  */
 public class AppFrame extends JFrame {
 
@@ -44,9 +43,9 @@ public class AppFrame extends JFrame {
     contentPane = new JPanel();
     contentPane.setLayout(new BorderLayout());
 
-    contentPane.add(leftPanel, BorderLayout.WEST);
-    contentPane.add(middlePanel.panel(), BorderLayout.CENTER);
-    contentPane.add(rightPanel, BorderLayout.EAST);
+    contentPane.add(this.leftPanel, BorderLayout.WEST);
+    contentPane.add(this.middlePanel.panel(), BorderLayout.CENTER);
+    contentPane.add(this.rightPanel, BorderLayout.EAST);
 
     setContentPane(contentPane);
 
@@ -104,7 +103,6 @@ public class AppFrame extends JFrame {
    * Toggles this frame to be full screen on systems main device.
    *
    * relies on local service for device reference.
-   *
    * displays this frame on full screen or returns to windowed.
    */
   public void fullscreen() {
